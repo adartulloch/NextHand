@@ -27,10 +27,11 @@ This app will provide users with the ability to share items and borrow/donate it
 
 * Users can create an account and setup a profile.
 * Users can use their camera to upload items to their profile.
-    * Users can distinguish between items they no longer need (for donation) and items only for borrowing as they post.
-* Users can press "inquire" on an item on their feed, which triggers a notification to the author of the post. That author can accept or reject the inquiry. If the author accepts, the interested user will be able to view the author's phone number and email information to  coordinate the details of picking up an item.
 * Users can view a feed of items that are posted within their area. 
 * Users can view a map of their surrounding area with pinpoints of items up for borrow/donation.
+    * Users can distinguish between items they no longer need (for donation) and items only for borrowing as they post.
+* Users can press "inquire" on an item on their feed, which triggers a notification to the author of the post. That author can accept or reject the inquiry. If the author accepts, the interested user will be able to view the author's phone number and email information to  coordinate the details of picking up an item.
+
 
 **Optional Nice-to-have Stories**
 

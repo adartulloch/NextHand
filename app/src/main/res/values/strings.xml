@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">NextHand</string>
+    <string name="home">Home</string>
+    <string name="map">Map</string>
+    <string name="compose">Compose</string>
+    <string name="profile">Profile</string>
+</resources>

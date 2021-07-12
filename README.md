@@ -84,8 +84,7 @@ This app will provide users with the ability to share items and borrow/donate it
    | image         | File     | image that user posts |
    | caption       | String   | image caption by author |
    | donation | Boolean   | flag that determines whether or not an item is up for donation (true) or borrowing (false) |
-   | lat    | String   | latitude coordinates of the location of the user *at the time of posting* |
-   | long    | String   | latitude coordinates of the location of the user *at the time of posting* |
+   | location    | [ParseGeoPoint](https://parseplatform.org/Parse-SDK-Android/api/com/parse/ParseGeoPoint.html)   | lat/long coordinates of the location of the item *at the time of posting* |
    | inquiries   | JSONArray | array of pointers to user objects that signal which users have inquired about an item|
    | category     | String |  categorical description of the item
    | isAvailable    | Boolean | flag that determines if an item is still available (True) or has been given away (False)

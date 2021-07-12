@@ -80,7 +80,7 @@ This app will provide users with the ability to share items and borrow/donate it
    | Property      | Type     | Description |
    | ------------- | -------- | ------------|
    | objectId      | String   | unique id for the user post (default field) |
-   | author        | Pointer to User| image author |
+   | author        | ParseUser| image author |
    | image         | File     | image that user posts |
    | caption       | String   | image caption by author |
    | donation | Boolean   | flag that determines whether or not an item is up for donation (true) or borrowing (false) |

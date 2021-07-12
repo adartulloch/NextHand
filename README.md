@@ -26,17 +26,22 @@ This app will provide users with the ability to share items and borrow/donate it
 **Required Must-have Stories**
 
 * Users can create an account and setup a profile.
+    * Define the models for an Item and User.
+    * Setup Parse sever and database.
 * Users can use their camera to upload items to their profile.
-* Users can view a feed of items that are posted within their area. 
-* Users can view a map of their surrounding area with pinpoints of items up for borrow/donation.
     * Users can distinguish between items they no longer need (for donation) and items only for borrowing as they post.
+* Users can view a feed of items that are posted within their area.
+    * Use material design card views as the RecyclerView for the feed.
+    *  Clicking on an item opens a details activity where users view more information about items. 
+* Users can view a map of their surrounding area with pinpoints of items up for borrow/donation.
+    * Integrate with Google Maps SDK
 * Users can press "inquire" on an item on their feed, which triggers a notification to the author of the post. That author can accept or reject the inquiry. If the author accepts, the interested user will be able to view the author's phone number and email information to  coordinate the details of picking up an item.
-
 
 **Optional Nice-to-have Stories**
 
-* Users can search for items (and have results displayed within a certain radius)
 * Users can initiate a private chat with another user who is interested in an item they post.
+* Users can search for items (and have results displayed within a certain radius)
+
 
 ### 2. Screen Archetypes
 

@@ -1,54 +1,154 @@
 package com.example.nexthand.fragments;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.nexthand.R;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
-import org.jetbrains.annotations.NotNull;
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.RuntimePermissions;
 
-public class MapFragment extends Fragment implements OnMapReadyCallback {
+import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
+
+@RuntimePermissions
+public class MapFragment extends Fragment {
+
+    public static final String TAG = "MapFragment";
+    private final static String KEY_LOCATION = "location";
+
+    private SupportMapFragment mapFragment;
+    private GoogleMap mMap;
+    private Context mContext;
+    private Location mCurrentLocation;
+
+
     @Nullable
     @org.jetbrains.annotations.Nullable
     @Override
-    public View onCreateView(@NonNull @org.jetbrains.annotations.NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull @org.jetbrains.annotations.NotNull LayoutInflater inflater,
+                             @Nullable @org.jetbrains.annotations.Nullable ViewGroup container,
+                             @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_map, container, false);
 
-        //Initialize Map Fragment
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        mContext = getContext();
 
-        //Load map async
-        mapFragment.getMapAsync(this);
+        if (savedInstanceState != null && savedInstanceState.keySet().contains(KEY_LOCATION)) {
+            // TODO: Bundle existing location via saveInstanceState. Since KEY_LOCATION was found in the Bundle,
+            //  we can be sure that mCurrentLocation is not null.
+            mCurrentLocation = savedInstanceState.getParcelable(KEY_LOCATION);
+        }
 
+        mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(GoogleMap map) {
+                    loadMap(map);
+                    map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                }
+            });
+        } else {
+            Toast.makeText(mContext, "Error - Map Fragment was null!!", Toast.LENGTH_SHORT).show();
+        }
         return view;
     }
 
+    // Register the permissions callback, which handles the user's response to the
+    // system permissions dialog. Save the return value, an instance of
+    // ActivityResultLauncher, as an instance variable.
+    private ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    // Permission is granted. Continue the action or workflow in your
+                    // app.
+                } else {
+                    // Explain to the user that the feature is unavailable because the
+                    // features requires a permission that the user has denied. At the
+                    // same time, respect the user's decision. Don't link to system
+                    // settings in an effort to convince the user to change their
+                    // decision.
+                }
+            });
+
+    protected void loadMap(GoogleMap googleMap) {
+        mMap = googleMap;
+        if (mMap != null) {
+            Toast.makeText(mContext, "Map Fragment was loaded properly!", Toast.LENGTH_SHORT).show();
+            getMyLocation();
+        } else {
+            Toast.makeText(mContext, "Error - Map was null!!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+    void getMyLocation() {
+        mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+        FusedLocationProviderClient locationClient = getFusedLocationProviderClient(mContext);
+        locationClient.getLastLocation()
+                .addOnSuccessListener(new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        if (location != null) {
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                    new LatLng(location.getLatitude(),
+                                            location.getLongitude()), 12));
+                            saveCurrentUserLocation(location);
+                        } else {
+                            Log.i(TAG, "Location is null!");
+
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG, "Error trying to get last GPS location");
+                        e.printStackTrace();
+                    }
+                });
+    }
+
     @Override
-    public void onMapReady(@NonNull @NotNull GoogleMap googleMap) {
-        // Set the map coordinates to Kyoto Japan.
-        LatLng kyoto = new LatLng(35.00116, 135.7681);
-        // Set the map type to Hybrid.
-        googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-        // Add a marker on the map coordinates.
-        googleMap.addMarker(new MarkerOptions()
-                .position(kyoto)
-                .title("Kyoto"));
-        // Move the camera to the map coordinates and zoom in closer.
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(kyoto));
-        googleMap.moveCamera(CameraUpdateFactory.zoomTo(15));
-        // Display traffic.
-        googleMap.setTrafficEnabled(true);
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        MapFragmentPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
+
+    public void saveCurrentUserLocation(Location location) {
+        if (location == null) {
+            return;
+        }
+        mCurrentLocation = location;
+        String msg = "Current Location is: " +
+                Double.toString(mCurrentLocation.getLatitude()) + "," +
+                Double.toString(mCurrentLocation.getLongitude());
+        Toast.makeText(mContext, msg, Toast.LENGTH_LONG).show();
     }
 }

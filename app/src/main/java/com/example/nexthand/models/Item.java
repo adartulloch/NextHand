@@ -1,14 +1,14 @@
  package com.example.nexthand.models;
 
+import com.parse.ParseClassName;
+import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
+import com.parse.ParseObject;
+import com.parse.ParseUser;
 import org.json.JSONArray;
 
-import java.io.File;
-
-/*
-public class Item {
-
-     Here are the keys necessary for database retrieval. We don't actually need to define the keys "objectId", "createdAt",
-    and "updatedAt" as they are default fields provided by methods defined in the Parse Library
+@ParseClassName("Item")
+public class Item extends ParseObject {
 
     public static final String KEY_AUTHOR = "author";
     public static final String KEY_IMAGE = "image";
@@ -43,7 +43,7 @@ public class Item {
     }
 
     public boolean getDonation() {
-        return getBoolean(KEY_DONATION);
+        return getBoolean(KEY_ISDONATION);
     }
 
     public void setDonation(Boolean isDonation) {
@@ -51,7 +51,7 @@ public class Item {
     }
 
     public ParseGeoPoint getLocation() {
-        return getParseGeoPOint(KEY_LOCATION);
+        return getParseGeoPoint(KEY_LOCATION);
     }
 
     public void setLocation(ParseGeoPoint point) {
@@ -71,15 +71,14 @@ public class Item {
     }
 
     public void setCategory(String category) {
-        put(KEY_CATEGORY, caption);
+        put(KEY_CATEGORY, category);
     }
 
-    public String getIsAvailable() {
-        return getString(KEY_ISAVAILABLE);
+    public boolean getIsAvailable() {
+        return getBoolean(KEY_ISAVAILABLE);
     }
 
-    public void setCategory(String category) {
-        put(KEY_ISAVAILABLE, caption);
+    public void setIsAvailable(Boolean isAvailable) {
+        put(KEY_ISAVAILABLE, isAvailable);
     }
-
-} */
+}

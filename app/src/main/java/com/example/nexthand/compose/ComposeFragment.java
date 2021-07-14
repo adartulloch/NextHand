@@ -1,4 +1,4 @@
-package com.example.nexthand.fragments;
+package com.example.nexthand.compose;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

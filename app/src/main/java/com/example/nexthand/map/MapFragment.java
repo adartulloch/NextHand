@@ -1,8 +1,9 @@
-package com.example.nexthand.fragments;
+package com.example.nexthand.map;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,11 +16,11 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.nexthand.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -77,28 +78,21 @@ public class MapFragment extends Fragment {
         return view;
     }
 
-    // Register the permissions callback, which handles the user's response to the
-    // system permissions dialog. Save the return value, an instance of
-    // ActivityResultLauncher, as an instance variable.
-    private ActivityResultLauncher<String> requestPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
-                    // Permission is granted. Continue the action or workflow in your
-                    // app.
-                } else {
-                    // Explain to the user that the feature is unavailable because the
-                    // features requires a permission that the user has denied. At the
-                    // same time, respect the user's decision. Don't link to system
-                    // settings in an effort to convince the user to change their
-                    // decision.
-                }
-            });
-
     protected void loadMap(GoogleMap googleMap) {
         mMap = googleMap;
         if (mMap != null) {
             Toast.makeText(mContext, "Map Fragment was loaded properly!", Toast.LENGTH_SHORT).show();
-            getMyLocation();
+            if (ContextCompat.checkSelfPermission(getActivity(),
+                    Manifest.permission.ACCESS_COARSE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                // request the permission
+                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                        9000);
+            }
+            else {
+                getMyLocation();
+            }
         } else {
             Toast.makeText(mContext, "Error - Map was null!!", Toast.LENGTH_SHORT).show();
         }
@@ -122,7 +116,6 @@ public class MapFragment extends Fragment {
                             saveCurrentUserLocation(location);
                         } else {
                             Log.i(TAG, "Location is null!");
-
                         }
                     }
                 })

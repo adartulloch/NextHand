@@ -1,13 +1,14 @@
-package com.example.nexthand.models;
+ package com.example.nexthand.models;
 
 import org.json.JSONArray;
 
 import java.io.File;
 
+/*
 public class Item {
 
-    /* Here are the keys necessary for database retrieval. We don't actually need to define the keys "objectId", "createdAt",
-    and "updatedAt" as they are default fields provided by methods defined in the Parse Library */
+     Here are the keys necessary for database retrieval. We don't actually need to define the keys "objectId", "createdAt",
+    and "updatedAt" as they are default fields provided by methods defined in the Parse Library
 
     public static final String KEY_AUTHOR = "author";
     public static final String KEY_IMAGE = "image";
@@ -81,4 +82,4 @@ public class Item {
         put(KEY_ISAVAILABLE, caption);
     }
 
-}
+} */

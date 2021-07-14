@@ -1,9 +1,10 @@
 package com.example.nexthand.models;
 
+/*
 public class User {
 
-    /* Here are the keys necessary for database retrieval. We don't actually need to define the keys "objectId", "createdAt",
-    and "updatedAt" as they are default fields provided by methods defined in the Parse Library */
+     Here are the keys necessary for database retrieval. We don't actually need to define the keys "objectId", "createdAt",
+    and "updatedAt" as they are default fields provided by methods defined in the Parse Library
 
     public static final String KEY_USERNAME = "username";
     public static final String KEY_PROFILE_IMAGE = "profileImage";
@@ -42,4 +43,4 @@ public class User {
         put(KEY_EMAIL_ADDRESS, emailAddress);
     }
 
-}
+}*/

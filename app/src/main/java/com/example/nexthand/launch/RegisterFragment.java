@@ -14,25 +14,30 @@ import android.widget.Toast;
 
 import com.example.nexthand.MainActivity;
 import com.example.nexthand.R;
+import com.example.nexthand.models.User;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
-import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.parse.SignUpCallback;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link LoginFragment#newInstance} factory method to
+ * Use the {@link RegisterFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class LoginFragment extends Fragment {
+public class RegisterFragment extends Fragment {
 
-    public static final String TAG = "LoginFragment";
+    public static final String TAG = "RegisterFragment";
     private Context mContext;
+    private TextInputEditText mEtFirstName;
     private TextInputEditText mEtUsername;
     private TextInputEditText mEtPassword;
-    private MaterialButton mBtnSignIn;
-    private MaterialButton mBtnSignUp;
+    private TextInputEditText mEtPhoneNumber;
+    private TextInputEditText mEtEmailAddress;
+    private MaterialButton mBtnRegister;
+    private MaterialButton mBtnCancel;
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -43,7 +48,7 @@ public class LoginFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public LoginFragment() {
+    public RegisterFragment() {
         // Required empty public constructor
     }
 
@@ -53,11 +58,11 @@ public class LoginFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment LoginFragment.
+     * @return A new instance of fragment RegisterFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static LoginFragment newInstance(String param1, String param2) {
-        LoginFragment fragment = new LoginFragment();
+    public static RegisterFragment newInstance(String param1, String param2) {
+        RegisterFragment fragment = new RegisterFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -78,34 +83,39 @@ public class LoginFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_login, container, false);
+        View view = inflater.inflate(R.layout.fragment_register, container, false);
 
         mContext = getContext();
+        mEtFirstName = view.findViewById(R.id.etFirstName);
         mEtUsername = view.findViewById(R.id.etUsername);
         mEtPassword = view.findViewById(R.id.etPassword);
-        mBtnSignIn = view.findViewById(R.id.btnSignIn);
-        mBtnSignUp = view.findViewById(R.id.btnSignUp);
+        mEtPhoneNumber = view.findViewById(R.id.etPhoneNumber);
+        mEtEmailAddress = view.findViewById(R.id.etEmailAddress);
+        mBtnRegister = view.findViewById(R.id.btnRegister);
+        mBtnCancel = view.findViewById(R.id.btnCancel);
+        mBtnRegister = view.findViewById(R.id.btnRegister);
 
-        mBtnSignUp.setOnClickListener(v -> {
-            getParentFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.container, new RegisterFragment())
-                    .addToBackStack(null)
-                    .commit();
-        });
+        mBtnCancel.setOnClickListener(v -> getParentFragmentManager()
+                .popBackStack());
 
-        mBtnSignIn.setOnClickListener(v -> {
-            String username = mEtUsername.getText().toString();
+        mBtnRegister.setOnClickListener(v -> {
+            String firstName = mEtFirstName.getText().toString();
+            String username = mEtFirstName.getText().toString();
             String password = mEtPassword.getText().toString();
-            loginUser(username, password);
+            String phoneNumber = mEtPhoneNumber.getText().toString();
+            String emailAddress = mEtEmailAddress.getText().toString();
+
+            createUser(firstName, username, password, phoneNumber, emailAddress);
+
         });
 
         return view;
     }
 
-    private void loginUser(String username, String password) {
-        Log.i(TAG,"Attempting to login " + username);
+    private void createUser(String firstName, String username, String password, String phoneNumber, String emailAddress) {
+        Log.i(TAG,"Registering the user " + username);
 
+        //TODO: More robust input validation
         if (username.isEmpty()) {
             Toast.makeText(mContext, "Your username cannot be empty!", Toast.LENGTH_LONG);
             return;
@@ -116,18 +126,20 @@ public class LoginFragment extends Fragment {
             return;
         }
 
-        // Todo: navigate to the main activity if the user has signed in successfully
-        ParseUser.logInInBackground(username, password, new LogInCallback() {
-            @Override
-            public void done(ParseUser user, ParseException e) {
-                if (e != null) {
-                    Log.i(TAG, "Issue with login", e);
-                    return;
-                }
-                Log.i(TAG, "Navigating into the feed");
-                // TODO: navigate to the Main Activity if the user has signed in successfully
-                goMainActivity();
+        ParseUser user = new ParseUser();
+        user.put(User.KEY_FIRSTNAME, firstName);
+        user.setUsername(username);
+        user.setPassword(username);
+        user.setEmail(emailAddress);
+        user.put(User.KEY_PHONE_NUMBER, phoneNumber);
+
+        user.signUpInBackground(e -> {
+            if (e != null) {
+                Log.i(TAG, "Issue with login", e);
+                return;
             }
+            Log.i(TAG, "Navigating into the feed");
+            goMainActivity();
         });
     }
 

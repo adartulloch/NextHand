@@ -11,6 +11,7 @@ public class User extends ParseObject {
     public static final String KEY_PROFILE_IMAGE = "profileImage";
     public static final String KEY_PHONE_NUMBER = "phoneNumber";
     public static final String KEY_EMAIL_ADDRESS = "emailAddress";
+    public static final String KEY_FIRSTNAME = "firstname";
 
     public String getUsername() {
         return getString("username");

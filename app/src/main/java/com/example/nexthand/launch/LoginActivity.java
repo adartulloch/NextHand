@@ -18,18 +18,8 @@ public class LoginActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()
-                    .add(R.id.container, new LoginFragment())
+                    .replace(R.id.container, new LoginFragment())
                     .commit();
         }
-    }
-
-    public void navigateTo(Fragment fragment, boolean addToBackStack) {
-        FragmentTransaction transaction = getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.container, fragment);
-        if (addToBackStack) {
-            transaction.addToBackStack(null);
-        }
-        transaction.commit();
     }
 }

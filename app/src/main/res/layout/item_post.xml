@@ -1,5 +1,6 @@
 <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cvRoot"
     android:layout_marginLeft="@dimen/grid_margin"
     android:layout_marginRight="@dimen/grid_margin"
@@ -20,7 +21,8 @@
             android:id="@+id/ivProfile"
             android:layout_width="match_parent"
             android:layout_height="@dimen/grid_profile_height"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"
+            tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
         <RelativeLayout
             android:layout_alignParentBottom="true"
@@ -37,8 +39,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
+                android:textColor="@android:color/black"
                 android:textSize="@dimen/contact_text_size"
-                android:textColor="@android:color/black" />
+                tools:text="Caterpillar for adoption" />
         </RelativeLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

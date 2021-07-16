@@ -20,14 +20,24 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.nexthand.R;
+import com.example.nexthand.models.Item;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
+import com.parse.ParseQuery;
+
+import java.util.List;
 
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
@@ -81,7 +91,6 @@ public class MapFragment extends Fragment {
     protected void loadMap(GoogleMap googleMap) {
         mMap = googleMap;
         if (mMap != null) {
-            Toast.makeText(mContext, "Map Fragment was loaded properly!", Toast.LENGTH_SHORT).show();
             if (ContextCompat.checkSelfPermission(getActivity(),
                     Manifest.permission.ACCESS_COARSE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED) {
@@ -114,6 +123,7 @@ public class MapFragment extends Fragment {
                                     new LatLng(location.getLatitude(),
                                             location.getLongitude()), 12));
                             saveCurrentUserLocation(location);
+                            queryPosts();
                         } else {
                             Log.i(TAG, "Location is null!");
                         }
@@ -139,6 +149,27 @@ public class MapFragment extends Fragment {
         String msg = "Current Location is: " +
                 Double.toString(mCurrentLocation.getLatitude()) + "," +
                 Double.toString(mCurrentLocation.getLongitude());
-        Toast.makeText(mContext, msg, Toast.LENGTH_LONG).show();
+    }
+
+    private void queryPosts() {
+        Log.i(TAG, "querying posts");
+        ParseQuery<Item> query = ParseQuery.getQuery(Item.class);
+        query.include(Item.KEY_AUTHOR);
+        query.findInBackground((items, e) -> {
+            for (Item item : items) {
+                if (item.getIsAvailable()) {
+                    addMarker(item);
+                }
+            }
+        });
+    }
+
+    private void addMarker(Item item) {
+        if (mMap != null) {
+            Log.i(TAG, "adding marker for " + item.getLocation().getLongitude() + " " + item.getLocation().getLongitude());
+            mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(item.getLocation().getLatitude(), item.getLocation().getLongitude()))
+                    .title(item.getTitle()));
+        }
     }
 }

@@ -99,20 +99,20 @@ public class RegisterFragment extends Fragment {
                 .popBackStack());
 
         mBtnRegister.setOnClickListener(v -> {
-            String firstName = mEtFirstName.getText().toString();
+            String firstname = mEtFirstName.getText().toString();
             String username = mEtFirstName.getText().toString();
             String password = mEtPassword.getText().toString();
             String phoneNumber = mEtPhoneNumber.getText().toString();
             String emailAddress = mEtEmailAddress.getText().toString();
 
-            createUser(firstName, username, password, phoneNumber, emailAddress);
+            createUser(firstname, username, password, phoneNumber, emailAddress);
 
         });
 
         return view;
     }
 
-    private void createUser(String firstName, String username, String password, String phoneNumber, String emailAddress) {
+    private void createUser(String firstname, String username, String password, String phoneNumber, String emailAddress) {
         Log.i(TAG,"Registering the user " + username);
 
         //TODO: More robust input validation
@@ -127,7 +127,7 @@ public class RegisterFragment extends Fragment {
         }
 
         ParseUser user = new ParseUser();
-        user.put(User.KEY_FIRSTNAME, firstName);
+        user.put(User.KEY_FIRSTNAME, firstname);
         user.setUsername(username);
         user.setPassword(username);
         user.setEmail(emailAddress);

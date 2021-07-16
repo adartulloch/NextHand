@@ -18,11 +18,11 @@
         android:layout_height="match_parent">
 
         <ImageView
-            android:id="@+id/ivProfile"
+            android:id="@+id/ivPost"
             android:layout_width="match_parent"
             android:layout_height="@dimen/grid_profile_height"
             android:scaleType="centerCrop"
-            tools:srcCompat="@tools:sample/backgrounds/scenic" />
+            tools:srcCompat="@tools:sample/avatars" />
 
         <RelativeLayout
             android:layout_alignParentBottom="true"
@@ -35,13 +35,13 @@
                 android:layout_height="match_parent" />
 
             <TextView
-                android:id="@+id/tvName"
+                android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:textColor="@android:color/black"
                 android:textSize="@dimen/contact_text_size"
-                tools:text="Caterpillar for adoption" />
+                tools:text="Someone borrow my little brother" />
         </RelativeLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

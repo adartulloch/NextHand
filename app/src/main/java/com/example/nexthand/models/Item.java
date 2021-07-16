@@ -10,6 +10,7 @@ import org.json.JSONArray;
 @ParseClassName("Item")
 public class Item extends ParseObject {
 
+    public static final String KEY_TITLE = "title";
     public static final String KEY_AUTHOR = "author";
     public static final String KEY_IMAGE = "image";
     public static final String KEY_CAPTION = "caption";
@@ -19,6 +20,16 @@ public class Item extends ParseObject {
     public static final String KEY_CATEGORY = "category";
     public static final String KEY_ISAVAILABLE = "isAvailable";
 
+    public Item() {}
+
+    public String getTitle() {
+        return getString(KEY_TITLE);
+    }
+
+    public void putTitle(String title) {
+        put(KEY_TITLE, title);
+    }
+
     public ParseUser getAuthor() {
         return getParseUser(KEY_AUTHOR);
     }
@@ -26,6 +37,7 @@ public class Item extends ParseObject {
     public void setAuthor(ParseUser author) {
         put(KEY_AUTHOR, author);
     }
+
     public ParseFile getImage() {
         return getParseFile(KEY_IMAGE);
     }

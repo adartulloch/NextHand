@@ -22,12 +22,18 @@ import java.util.List;
 
 public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder>{
 
+    public interface onClickListener {
+        void onItemClicked(int position);
+    }
+
+    private onClickListener onClickListener;
     private Context mContext;
     private List<Item> items;
 
-    public ItemsAdapter(Context mContext, List<Item> items) {
+    public ItemsAdapter(Context mContext, List<Item> items, onClickListener onClickListener) {
         this.mContext = mContext;
         this.items = items;
+        this.onClickListener = onClickListener;
     }
 
     @NonNull
@@ -53,7 +59,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder>{
         items.clear();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class ViewHolder extends RecyclerView.ViewHolder {
 
         private ImageView ivPost;
         private TextView tvTitle;
@@ -62,20 +68,14 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder>{
             super(itemView);
             ivPost = itemView.findViewById(R.id.ivPost);
             tvTitle = itemView.findViewById(R.id.tvTitle);
-            itemView.setOnClickListener(this);
+            itemView.setOnClickListener(v -> {
+                onClickListener.onItemClicked(getAdapterPosition());
+            });
         }
 
         public void bind(Item item) {
             Glide.with(mContext).load(item.getParseFile(Item.KEY_IMAGE).getUrl()).into(ivPost);
             tvTitle.setText(item.getTitle());
-        }
-
-        @Override
-        public void onClick(View v) {
-            int position = getAdapterPosition();
-            if (position != RecyclerView.NO_POSITION) {
-                //TODO: Implement DetailsFragment, Bundle Item and share with new DetailsFragment
-            }
         }
     }
 }

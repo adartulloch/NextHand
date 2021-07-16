@@ -34,7 +34,7 @@ import java.util.List;
 
 import permissions.dispatcher.NeedsPermission;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements ItemsAdapter.onClickListener{
 
     public static final String TAG = "HomeFragment";
     private static final int QUERY_LIMIT = 20;
@@ -52,7 +52,7 @@ public class HomeFragment extends Fragment {
         View view =  inflater.inflate(R.layout.fragment_home, container, false);
         mContext = getContext();
         mItems = new ArrayList();
-        mItemsAdapter = new ItemsAdapter(mContext, mItems);
+        mItemsAdapter = new ItemsAdapter(mContext, mItems, this);
         mRvItems = view.findViewById(R.id.rvItems);
         mRvItems.setAdapter(mItemsAdapter);
         mLocationClient = new FusedLocationProviderClient(mContext);
@@ -93,5 +93,12 @@ public class HomeFragment extends Fragment {
             mItems.addAll(items);
             mItemsAdapter.notifyDataSetChanged();
         });
+    }
+
+    @Override
+    public void onItemClicked(int position) {
+        if (position != RecyclerView.NO_POSITION) {
+            //TODO: Implement DetailsFragment, Bundle Item and share with new DetailsFragment
+        }
     }
 }

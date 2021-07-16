@@ -146,9 +146,6 @@ public class MapFragment extends Fragment {
 
     public void saveCurrentUserLocation(Location location) {
         mCurrentLocation = location;
-        String msg = "Current Location is: " +
-                Double.toString(mCurrentLocation.getLatitude()) + "," +
-                Double.toString(mCurrentLocation.getLongitude());
     }
 
     private void queryPosts() {

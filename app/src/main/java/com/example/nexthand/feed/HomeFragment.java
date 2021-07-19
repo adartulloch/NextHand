@@ -104,10 +104,7 @@ public class HomeFragment extends Fragment implements ItemsAdapter.onClickListen
     private void openDetails(Item item) {
         Bundle args = new Bundle();
         args.putSerializable(Item.TAG, item);
-        Log.i("HomeFragment", "Location is " + mLocation.getLongitude());
-
-        args.putParcelable("Location", mLocation);
-
+        args.putParcelable(Item.KEY_LOCATION, mLocation);
         Fragment details = new DetailsFragment();
         details.setArguments(args);
         getParentFragmentManager().beginTransaction()

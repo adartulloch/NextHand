@@ -87,11 +87,11 @@ public class DetailsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_details, container, false);
         Bundle args = getArguments();
         if (args != null) {
             mItem = (Item) args.getSerializable(Item.TAG);
+            mLocation = args.getParcelable(Item.KEY_LOCATION);
         }
 
         mIvProfile = (ImageView) view.findViewById(R.id.ivProfile);
@@ -121,9 +121,7 @@ public class DetailsFragment extends Fragment {
         Glide.with(this).asBitmap().load(mItem.getImage().getUrl()).centerCrop().into(target);
         mTvName.setText(mItem.getTitle());
         mTvDescription.setText(mItem.getCaption());
-
-        Location location = args.getParcelable("Location");
-        mTvMilesAway.setText(mItem.milesAway(new ParseGeoPoint(location.getLatitude(), location.getLongitude())));
+        mTvMilesAway.setText(mItem.milesAway(new ParseGeoPoint(mLocation.getLatitude(), mLocation.getLongitude())));
 
         return view;
     }

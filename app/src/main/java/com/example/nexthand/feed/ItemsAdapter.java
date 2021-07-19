@@ -74,7 +74,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder>{
         }
 
         public void bind(Item item) {
-            Glide.with(mContext).load(item.getParseFile(Item.KEY_IMAGE).getUrl()).into(ivPost);
+            Glide.with(mContext).load(item.getImage().getUrl()).into(ivPost);
             tvTitle.setText(item.getTitle());
         }
     }

@@ -82,7 +82,7 @@ public class HomeFragment extends Fragment implements ItemsAdapter.onClickListen
         ParseQuery<Item> query = ParseQuery.getQuery(Item.class);
         query.setLimit(QUERY_LIMIT);
         query.include(Item.KEY_AUTHOR);
-        query.whereWithinMiles(Item.KEY_LOCATION,  new ParseGeoPoint(mLocation.getLatitude(), mLocation.getLongitude()),5);
+        query.whereWithinMiles(Item.KEY_LOCATION,  new ParseGeoPoint(mLocation.getLatitude(), mLocation.getLongitude()),Integer.MAX_VALUE);
         query.findInBackground((items, e) -> {
             if (e != null) {
                 Log.e(TAG, "Error fetching items!", e);

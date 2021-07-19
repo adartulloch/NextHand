@@ -86,6 +86,10 @@ public class LoginFragment extends Fragment {
         mBtnSignIn = view.findViewById(R.id.btnSignIn);
         mBtnSignUp = view.findViewById(R.id.btnSignUp);
 
+        if (ParseUser.getCurrentUser() != null) {
+            goMainActivity();
+        }
+
         mBtnSignUp.setOnClickListener(v -> {
             getParentFragmentManager()
                     .beginTransaction()
@@ -130,6 +134,7 @@ public class LoginFragment extends Fragment {
 
     private void goMainActivity() {
         Intent i = new Intent(mContext, MainActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         startActivity(i);
     }
 }

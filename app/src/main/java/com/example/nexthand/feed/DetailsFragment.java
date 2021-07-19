@@ -1,14 +1,27 @@
 package com.example.nexthand.feed;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.palette.graphics.Palette;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.nexthand.R;
+import com.example.nexthand.models.Item;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,6 +34,13 @@ public class DetailsFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+
+    private Item mItem;
+    private ImageView mIvProfile;
+    private TextView mTvName;
+    private TextView mTvPhone;
+    private View mVPalette;
+    private FloatingActionButton mFab;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -61,6 +81,37 @@ public class DetailsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_details, container, false);
+        View view =  inflater.inflate(R.layout.fragment_details, container, false);
+        Bundle args = getArguments();
+        if (args != null) {
+            mItem = (Item) args.getSerializable(Item.TAG);
+        }
+
+        mIvProfile = (ImageView) view.findViewById(R.id.ivProfile);
+        mTvName = (TextView) view.findViewById(R.id.tvName);
+        mTvName = (TextView) view.findViewById(R.id.tvPhone);
+        mVPalette = view.findViewById(R.id.vPalette);
+        mFab = view.findViewById(R.id.fab);
+
+        //async listener for image loading
+        CustomTarget<Bitmap> target = new CustomTarget<Bitmap>() {
+            @Override
+            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                Glide.with(getActivity()).load(resource).into(mIvProfile);
+                Palette palette = Palette.from(resource).generate();
+                Palette.Swatch vibrant = palette.getLightVibrantSwatch();
+                Log.i("Tag ",  "palette is " + palette);
+                if (vibrant != null) {
+                    mVPalette.setBackgroundColor(vibrant.getRgb());
+                    mTvName.setTextColor(vibrant.getTitleTextColor());
+                }
+            }
+            @Override
+            public void onLoadCleared(@Nullable Drawable placeholder) {}
+        };
+        Glide.with(this).asBitmap().load(mItem.getImage().getUrl()).centerCrop().into(target);
+        mTvName.setText(mItem.getTitle());
+
+        return view;
     }
 }

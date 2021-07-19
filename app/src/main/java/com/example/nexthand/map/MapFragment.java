@@ -73,6 +73,7 @@ public class MapFragment extends Fragment {
             mCurrentLocation = savedInstanceState.getParcelable(KEY_LOCATION);
         }
 
+
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(new OnMapReadyCallback() {
@@ -100,7 +101,7 @@ public class MapFragment extends Fragment {
                         9000);
             }
             else {
-                getMyLocation();
+                sendQuery();
             }
         } else {
             Toast.makeText(mContext, "Error - Map was null!!", Toast.LENGTH_SHORT).show();
@@ -109,7 +110,7 @@ public class MapFragment extends Fragment {
 
     @SuppressLint("MissingPermission")
     @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
-    void getMyLocation() {
+    void sendQuery() {
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
@@ -149,7 +150,6 @@ public class MapFragment extends Fragment {
     }
 
     private void queryPosts() {
-        Log.i(TAG, "querying posts");
         ParseQuery<Item> query = ParseQuery.getQuery(Item.class);
         query.include(Item.KEY_AUTHOR);
         query.findInBackground((items, e) -> {
@@ -163,10 +163,10 @@ public class MapFragment extends Fragment {
 
     private void addMarker(Item item) {
         if (mMap != null) {
-            Log.i(TAG, "adding marker for " + item.getLocation().getLongitude() + " " + item.getLocation().getLongitude());
             mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(item.getLocation().getLatitude(), item.getLocation().getLongitude()))
                     .title(item.getTitle()));
+
         }
     }
 }

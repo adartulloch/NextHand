@@ -57,18 +57,17 @@ public class HomeFragment extends Fragment implements ItemsAdapter.onClickListen
         mRvItems.setAdapter(mItemsAdapter);
         mLocationClient = new FusedLocationProviderClient(mContext);
         mRvItems.setLayoutManager(new LinearLayoutManager(mContext));
-        getLocationAndQueryPosts();
+        sendQuery();
         return view;
     }
 
     @SuppressLint("MissingPermission")
     @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
-    private void getLocationAndQueryPosts() {
+    private void sendQuery() {
         mLocationClient.getLastLocation()
                 .addOnSuccessListener(location -> {
                     if (location != null) {
                         mLocation = location;
-                        Log.i(TAG, "In the home feed with the user's location : " + location.getLongitude() + " " + location.getLatitude());
                         queryPosts();
                     } else {
                         Log.i(TAG, "Location is null");
@@ -80,11 +79,10 @@ public class HomeFragment extends Fragment implements ItemsAdapter.onClickListen
     }
 
     private void queryPosts() {
-        Log.i(TAG, "querying posts");
         ParseQuery<Item> query = ParseQuery.getQuery(Item.class);
         query.setLimit(QUERY_LIMIT);
         query.include(Item.KEY_AUTHOR);
-        query.whereNear(Item.KEY_LOCATION, new ParseGeoPoint(mLocation.getLatitude(), mLocation.getLongitude()));
+        query.whereWithinMiles(Item.KEY_LOCATION,  new ParseGeoPoint(mLocation.getLatitude(), mLocation.getLongitude()),5);
         query.findInBackground((items, e) -> {
             if (e != null) {
                 Log.e(TAG, "Error fetching items!", e);
@@ -98,7 +96,19 @@ public class HomeFragment extends Fragment implements ItemsAdapter.onClickListen
     @Override
     public void onItemClicked(int position) {
         if (position != RecyclerView.NO_POSITION) {
-            //TODO: Implement DetailsFragment, Bundle Item and share with new DetailsFragment
+            openDetails(mItems.get(position));
         }
+    }
+
+    private void openDetails(Item item) {
+        Bundle args = new Bundle();
+        args.putSerializable(Item.TAG, item);
+        Fragment details = new DetailsFragment();
+        details.setArguments(args);
+        getParentFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, details)
+                .addToBackStack(null)
+                .commit();
     }
 }

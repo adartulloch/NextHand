@@ -7,9 +7,11 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 import org.json.JSONArray;
 
-@ParseClassName("Item")
-public class Item extends ParseObject {
+import java.io.Serializable;
 
+ @ParseClassName("Item")
+public class Item extends ParseObject implements Serializable {
+    public static final String TAG = "Item.class";
     public static final String KEY_TITLE = "title";
     public static final String KEY_AUTHOR = "author";
     public static final String KEY_IMAGE = "image";

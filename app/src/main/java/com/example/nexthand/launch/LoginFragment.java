@@ -116,7 +116,6 @@ public class LoginFragment extends Fragment {
             return;
         }
 
-        // Todo: navigate to the main activity if the user has signed in successfully
         ParseUser.logInInBackground(username, password, new LogInCallback() {
             @Override
             public void done(ParseUser user, ParseException e) {
@@ -124,8 +123,6 @@ public class LoginFragment extends Fragment {
                     Log.i(TAG, "Issue with login", e);
                     return;
                 }
-                Log.i(TAG, "Navigating into the feed");
-                // TODO: navigate to the Main Activity if the user has signed in successfully
                 goMainActivity();
             }
         });

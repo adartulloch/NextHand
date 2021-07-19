@@ -138,7 +138,6 @@ public class RegisterFragment extends Fragment {
                 Log.i(TAG, "Issue with login", e);
                 return;
             }
-            Log.i(TAG, "Navigating into the feed");
             goMainActivity();
         });
     }

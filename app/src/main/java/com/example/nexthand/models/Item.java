@@ -95,4 +95,20 @@ public class Item extends ParseObject implements Serializable {
     public void setIsAvailable(Boolean isAvailable) {
         put(KEY_ISAVAILABLE, isAvailable);
     }
+
+    public String milesAway(ParseGeoPoint point) {
+        int distance = (int) Math.floor(getLocation().distanceInMilesTo(point));
+        String msg = "";
+        switch (distance) {
+            case 0:
+                msg = "Less than a mile away";
+                break;
+            case 1:
+                msg = "One mile away";
+                break;
+            default: msg = distance + " miles away";
+                break;
+        }
+        return msg;
+    }
 }

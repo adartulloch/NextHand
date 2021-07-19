@@ -166,7 +166,6 @@ public class MapFragment extends Fragment {
             mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(item.getLocation().getLatitude(), item.getLocation().getLongitude()))
                     .title(item.getTitle()));
-
         }
     }
 }

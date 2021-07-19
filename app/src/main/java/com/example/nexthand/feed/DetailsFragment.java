@@ -2,6 +2,7 @@ package com.example.nexthand.feed;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -21,7 +22,10 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.nexthand.R;
 import com.example.nexthand.models.Item;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.parse.Parse;
+import com.parse.ParseGeoPoint;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,12 +38,15 @@ public class DetailsFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    public static final String TAG = "DetailsFragment";
 
     private Item mItem;
     private ImageView mIvProfile;
     private TextView mTvName;
-    private TextView mTvPhone;
+    private TextView mTvDescription;
+    private TextView mTvMilesAway;
     private View mVPalette;
+    private Location mLocation;
     private FloatingActionButton mFab;
 
     // TODO: Rename and change types of parameters
@@ -89,8 +96,9 @@ public class DetailsFragment extends Fragment {
 
         mIvProfile = (ImageView) view.findViewById(R.id.ivProfile);
         mTvName = (TextView) view.findViewById(R.id.tvName);
-        mTvName = (TextView) view.findViewById(R.id.tvPhone);
+        mTvDescription = (TextView) view.findViewById(R.id.tvDescription);
         mVPalette = view.findViewById(R.id.vPalette);
+        mTvMilesAway = view.findViewById(R.id.tvMilesAway);
         mFab = view.findViewById(R.id.fab);
 
         //async listener for image loading
@@ -104,6 +112,7 @@ public class DetailsFragment extends Fragment {
                 if (vibrant != null) {
                     mVPalette.setBackgroundColor(vibrant.getRgb());
                     mTvName.setTextColor(vibrant.getTitleTextColor());
+                    mTvMilesAway.setTextColor(vibrant.getTitleTextColor());
                 }
             }
             @Override
@@ -111,6 +120,10 @@ public class DetailsFragment extends Fragment {
         };
         Glide.with(this).asBitmap().load(mItem.getImage().getUrl()).centerCrop().into(target);
         mTvName.setText(mItem.getTitle());
+        mTvDescription.setText(mItem.getCaption());
+
+        Location location = args.getParcelable("Location");
+        mTvMilesAway.setText(mItem.milesAway(new ParseGeoPoint(location.getLatitude(), location.getLongitude())));
 
         return view;
     }

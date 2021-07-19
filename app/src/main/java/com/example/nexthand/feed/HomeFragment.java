@@ -29,6 +29,7 @@ import com.parse.ParseUser;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -103,10 +104,14 @@ public class HomeFragment extends Fragment implements ItemsAdapter.onClickListen
     private void openDetails(Item item) {
         Bundle args = new Bundle();
         args.putSerializable(Item.TAG, item);
+        Log.i("HomeFragment", "Location is " + mLocation.getLongitude());
+
+        args.putParcelable("Location", mLocation);
+
         Fragment details = new DetailsFragment();
         details.setArguments(args);
-        getParentFragmentManager()
-                .beginTransaction()
+        getParentFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.slide_in, 0, 0, 0)
                 .replace(R.id.fragment_container, details)
                 .addToBackStack(null)
                 .commit();

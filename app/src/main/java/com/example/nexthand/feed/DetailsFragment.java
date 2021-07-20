@@ -107,8 +107,7 @@ public class DetailsFragment extends Fragment {
             public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                 Glide.with(getActivity()).load(resource).into(mIvProfile);
                 Palette palette = Palette.from(resource).generate();
-                Palette.Swatch vibrant = palette.getLightVibrantSwatch();
-                Log.i("Tag ",  "palette is " + palette);
+                Palette.Swatch vibrant = palette.getLightMutedSwatch();
                 if (vibrant != null) {
                     mVPalette.setBackgroundColor(vibrant.getRgb());
                     mTvName.setTextColor(vibrant.getTitleTextColor());

@@ -34,7 +34,7 @@
             android:text="@string/slogan"
             android:textColor="@android:color/black"
             android:layout_marginBottom="10dp"
-            android:textSize="15sp" />
+            android:textSize="13sp" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
@@ -76,7 +76,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:text="@string/action_sign_in"
-                app:backgroundTint="#E8B3B3" />
+                app:backgroundTint="@color/teal_200" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSignUp"
@@ -85,8 +85,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="12dp"
                 android:layout_marginRight="12dp"
-                android:layout_toStartOf="@id/btnSignIn"
-                android:layout_toLeftOf="@id/btnSignIn"
+                android:layout_alignParentStart="true"
+                android:backgroundTint="@color/teal_200"
                 android:text="@string/action_sign_up"
                 android:textColor="#FFFFFF" />
         </RelativeLayout>

@@ -108,7 +108,7 @@ public class HomeFragment extends Fragment implements ItemsAdapter.onClickListen
         Fragment details = new DetailsFragment();
         details.setArguments(args);
         getParentFragmentManager().beginTransaction()
-                .setCustomAnimations(R.anim.slide_in, 0, 0, 0)
+                .setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
                 .replace(R.id.fragment_container, details)
                 .addToBackStack(null)
                 .commit();

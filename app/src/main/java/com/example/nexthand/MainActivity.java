@@ -1,19 +1,16 @@
 package com.example.nexthand;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
+
 import com.example.nexthand.compose.ComposeFragment;
 import com.example.nexthand.feed.HomeFragment;
 import com.example.nexthand.map.MapFragment;
 import com.example.nexthand.profile.ProfileFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import org.jetbrains.annotations.NotNull;
 
 public class MainActivity extends AppCompatActivity {
 

@@ -29,7 +29,6 @@
         android:id="@+id/btnCaptureImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="#D4D4D5"
         android:text="Take Picture"
         app:srcCompat="@drawable/ic_launch_nexthand"
         android:textColor="@color/black" />

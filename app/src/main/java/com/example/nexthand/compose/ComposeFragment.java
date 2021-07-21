@@ -114,79 +114,57 @@ public class ComposeFragment extends Fragment {
         mEtDescription = view.findViewById(R.id.etDescription);
         swDonation = view.findViewById(R.id.swDonation);
 
-        mBtnCaptureImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                launchCamera();
-            }
-        });
+        mBtnCaptureImage.setOnClickListener(v -> launchCamera());
 
-        mFabSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String title = mEtTitle.getText().toString();
-                if (title.isEmpty()) {
-                    Toast.makeText(getContext(), "Description can't be empty", Toast.LENGTH_LONG).show();
-                }
-                String description = mEtDescription.getText().toString();
-                if (description.isEmpty()) {
-                    Toast.makeText(getContext(), "Description can't be empty", Toast.LENGTH_LONG).show();
-                }
-                if (mPhotoFile == null || mIvPostImage.getDrawable() == null) {
-                    Toast.makeText(getContext(), "There is no image!", Toast.LENGTH_SHORT).show();
-                }
-                Boolean isDonation = swDonation.isChecked();
-                ParseUser currentUser = ParseUser.getCurrentUser();
-                savePost(title, description, currentUser, mPhotoFile, isDonation);
+        mFabSubmit.setOnClickListener(v -> {
+            String title = mEtTitle.getText().toString();
+            if (title.isEmpty()) {
+                Toast.makeText(getContext(), "Description can't be empty", Toast.LENGTH_LONG).show();
             }
+            String description = mEtDescription.getText().toString();
+            if (description.isEmpty()) {
+                Toast.makeText(getContext(), "Description can't be empty", Toast.LENGTH_LONG).show();
+            }
+            if (mPhotoFile == null || mIvPostImage.getDrawable() == null) {
+                Toast.makeText(getContext(), "There is no image!", Toast.LENGTH_SHORT).show();
+            }
+            Boolean isDonation = swDonation.isChecked();
+            ParseUser currentUser = ParseUser.getCurrentUser();
+            savePost(title, description, currentUser, mPhotoFile, isDonation);
         });
     }
 
     private void launchCamera() {
-        // create Intent to take a picture and return control to the calling application
+        Uri fileProvider = FileProvider.getUriForFile(getContext(),
+                "com.nexthand.fileprovider",
+                getPhotoFileUri(mPhotoFileName));
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Create a File reference for future access
-        mPhotoFile = getPhotoFileUri(mPhotoFileName);
-
-        Uri fileProvider = FileProvider.getUriForFile(getActivity(), "com.codepath.fileprovider.nexthand", mPhotoFile);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
-
-        // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
-        // So as long as the result is not null, it's safe to use the intent.
         if (intent.resolveActivity(getContext().getPackageManager()) != null) {
             startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
-        Log.i(TAG, "The request code is + " + requestCode);
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
-            if (resultCode == getActivity().RESULT_OK) {
-                // by this point we have the camera photo on disk
-                Bitmap takenImage = BitmapFactory.decodeFile(mPhotoFile.getAbsolutePath());
-                // RESIZE BITMAP, see section below
-                // Load the taken image into a preview
-                mIvPostImage.setImageBitmap(takenImage);
-            } else { // Result was a failure
-                Toast.makeText(getContext(), "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    // Returns the File for a photo stored on disk given the fileName
-    public File getPhotoFileUri(String fileName) {
-        // Get safe storage directory for photos
-        // Use `getExternalFilesDir` on Context to access package-specific directories.
-        // This way, we don't need to request external read/write runtime permissions.
+    private File getPhotoFileUri(String fileName) {
         File mediaStorageDir = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
-        // Create the storage directory if it does not exist
         if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()){
             Log.d(TAG, "failed to create directory");
         }
-        // Return the file target for the photo based on filename
-        return new File(mediaStorageDir.getPath() + File.separator + fileName);
+        File file = new File(mediaStorageDir.getPath() + File.separator + fileName);
+        return file;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == getActivity().RESULT_OK) {
+                Bitmap takenImage = BitmapFactory.decodeFile(mPhotoFile.getAbsolutePath());
+                mIvPostImage.setImageBitmap(takenImage);
+            } else {
+                Toast.makeText(getContext(), "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void savePost(String title, String caption, ParseUser currentUser, File photoFile, Boolean isDonation) {

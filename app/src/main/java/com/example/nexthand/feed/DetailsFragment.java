@@ -23,6 +23,7 @@ import com.bumptech.glide.request.transition.Transition;
 import com.example.nexthand.R;
 import com.example.nexthand.models.Item;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.Parse;
 import com.parse.ParseGeoPoint;
@@ -47,7 +48,7 @@ public class DetailsFragment extends Fragment {
     private TextView mTvMilesAway;
     private View mVPalette;
     private Location mLocation;
-    private FloatingActionButton mFab;
+    private ExtendedFloatingActionButton mFab;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -99,7 +100,7 @@ public class DetailsFragment extends Fragment {
         mTvDescription = (TextView) view.findViewById(R.id.tvDescription);
         mVPalette = view.findViewById(R.id.vPalette);
         mTvMilesAway = view.findViewById(R.id.tvMilesAway);
-        mFab = view.findViewById(R.id.fab);
+        mFab = view.findViewById(R.id.fabInquiry);
 
         //async listener for image loading
         CustomTarget<Bitmap> target = new CustomTarget<Bitmap>() {

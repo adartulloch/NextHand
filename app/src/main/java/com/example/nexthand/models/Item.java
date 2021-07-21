@@ -28,7 +28,7 @@ public class Item extends ParseObject implements Serializable {
         return getString(KEY_TITLE);
     }
 
-    public void putTitle(String title) {
+    public void setTitle(String title) {
         put(KEY_TITLE, title);
     }
 

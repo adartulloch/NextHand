@@ -8,22 +8,33 @@
     android:layout_margin="16dp"
     tools:context=".compose.ComposeFragment">
 
-    <EditText
-        android:id="@+id/etTitle"
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Title..."
-        />
+        android:layout_margin="4dp"
+        android:hint="What item would you like to share?">
 
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:maxLines="1" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <EditText
-        android:id="@+id/etDescription"
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Description..."
-        />
+        android:layout_margin="4dp"
+        android:hint="Provide details about the item">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:maxLines="1" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/btnCaptureImage"
@@ -46,19 +57,25 @@
         android:id="@+id/swDonation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Item for donation" />
+        android:text="Yes, I don't need this item returned to me" />
 
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/fabSubmit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginTop="10dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:text="Post Item"
-        android:theme="@style/Theme.MaterialComponents.NoActionBar"
-        app:icon="@drawable/outline_done_white_24dp" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/fabSubmit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="15dp"
+            android:text="Post Item"
+            android:theme="@style/Theme.MaterialComponents.NoActionBar"
+            app:icon="@drawable/outline_done_white_24dp" />
+    </RelativeLayout>
+
+
+
 
 
 </LinearLayout>

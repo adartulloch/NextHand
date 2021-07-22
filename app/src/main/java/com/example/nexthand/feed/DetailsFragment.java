@@ -101,14 +101,13 @@ public class DetailsFragment extends Fragment {
         }
 
         mContext = getContext();
-        mIvProfile = (ImageView) view.findViewById(R.id.ivProfile);
-        mTvName = (TextView) view.findViewById(R.id.tvName);
-        mTvDescription = (TextView) view.findViewById(R.id.tvDescription);
+        mIvProfile = view.findViewById(R.id.ivProfile);
+        mTvName = view.findViewById(R.id.tvName);
+        mTvDescription = view.findViewById(R.id.tvDescription);
         mVPalette = view.findViewById(R.id.vPalette);
         mTvMilesAway = view.findViewById(R.id.tvMilesAway);
         mFab = view.findViewById(R.id.fabInquiry);
 
-        //async listener for image loading
         CustomTarget<Bitmap> target = new CustomTarget<Bitmap>() {
             @Override
             public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
@@ -128,7 +127,7 @@ public class DetailsFragment extends Fragment {
         mTvName.setText(mItem.getTitle());
         mTvDescription.setText(mItem.getCaption());
         mTvMilesAway.setText(mItem.milesAway(new ParseGeoPoint(mLocation.getLatitude(), mLocation.getLongitude())));
-        mFab.setText("Inquire " + mItem.getAuthor().getUsername());
+        mFab.setText(getString(R.string.inquire_user, mItem.getAuthor().getUsername()));
         mFab.setOnClickListener(v -> {
             sendInquiry(mItem);
         });
@@ -141,14 +140,12 @@ public class DetailsFragment extends Fragment {
         inquiry.setItem(item);
         inquiry.setSender(ParseUser.getCurrentUser());
         inquiry.setRecipient(item.getAuthor());
-
         inquiry.saveInBackground(e -> {
             if (e == null) {
-                Toast.makeText(mContext, "You made an inquiry about the item", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "You have successfully placed an inquiry about the item", Toast.LENGTH_SHORT).show();
             } else {
                 Log.e(TAG, "Failed to save", e);
             }
         });
-
     }
 }

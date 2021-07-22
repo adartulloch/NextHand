@@ -12,6 +12,8 @@ public class Inquiry extends ParseObject implements Serializable {
     public static final String KEY_SENDER = "sender";
     public static final String KEY_RECIPIENT = "recipient";
 
+    public Inquiry () {}
+
     public ParseObject getItem() {
         return getParseObject(KEY_ITEM);
     }
@@ -33,6 +35,6 @@ public class Inquiry extends ParseObject implements Serializable {
     }
 
     public void setRecipient(ParseUser recipient) {
-        put(KEY_SENDER, KEY_RECIPIENT);
+        put(KEY_RECIPIENT, recipient);
     }
 }

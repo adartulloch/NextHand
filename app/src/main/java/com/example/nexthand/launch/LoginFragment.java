@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.example.nexthand.MainActivity;
 import com.example.nexthand.R;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.textfield.TextInputEditText;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
@@ -29,6 +30,7 @@ public class LoginFragment extends Fragment {
 
     public static final String TAG = "LoginFragment";
     private Context mContext;
+    private LinearProgressIndicator lpiLoading;
     private TextInputEditText mEtUsername;
     private TextInputEditText mEtPassword;
     private MaterialButton mBtnSignIn;
@@ -81,6 +83,7 @@ public class LoginFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
         mContext = getContext();
+        lpiLoading = view.findViewById(R.id.lpiLoading);
         mEtUsername = view.findViewById(R.id.etUsername);
         mEtPassword = view.findViewById(R.id.etPassword);
         mBtnSignIn = view.findViewById(R.id.btnSignIn);
@@ -99,6 +102,7 @@ public class LoginFragment extends Fragment {
         });
 
         mBtnSignIn.setOnClickListener(v -> {
+            lpiLoading.setVisibility(View.VISIBLE);
             String username = mEtUsername.getText().toString();
             String password = mEtPassword.getText().toString();
             loginUser(username, password);
@@ -127,6 +131,7 @@ public class LoginFragment extends Fragment {
                     Log.i(TAG, "Issue with login", e);
                     return;
                 }
+                lpiLoading.setVisibility(View.GONE);
                 goMainActivity();
             }
         });

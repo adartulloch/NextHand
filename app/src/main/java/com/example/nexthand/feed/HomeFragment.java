@@ -21,6 +21,7 @@ import com.example.nexthand.models.Item;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
@@ -42,6 +43,7 @@ public class HomeFragment extends Fragment implements ItemsAdapter.onClickListen
     private Context mContext;
     private List<Item> mItems;
     private ItemsAdapter mItemsAdapter;
+    private LinearProgressIndicator lpiLoading;
     private RecyclerView mRvItems;
     private FusedLocationProviderClient mLocationClient;
     private Location mLocation;
@@ -54,6 +56,7 @@ public class HomeFragment extends Fragment implements ItemsAdapter.onClickListen
         mContext = getContext();
         mItems = new ArrayList();
         mItemsAdapter = new ItemsAdapter(mContext, mItems, this);
+        lpiLoading = view.findViewById(R.id.lpiLoading);
         mRvItems = view.findViewById(R.id.rvItems);
         mRvItems.setAdapter(mItemsAdapter);
         mLocationClient = new FusedLocationProviderClient(mContext);
@@ -83,6 +86,7 @@ public class HomeFragment extends Fragment implements ItemsAdapter.onClickListen
         ParseQuery<Item> query = ParseQuery.getQuery(Item.class);
         query.setLimit(QUERY_LIMIT);
         query.include(Item.KEY_AUTHOR);
+        query.whereEqualTo(Item.KEY_ISAVAILABLE, true);
         query.whereWithinMiles(Item.KEY_LOCATION,  new ParseGeoPoint(mLocation.getLatitude(), mLocation.getLongitude()),Integer.MAX_VALUE);
         query.findInBackground((items, e) -> {
             if (e != null) {
@@ -91,6 +95,7 @@ public class HomeFragment extends Fragment implements ItemsAdapter.onClickListen
             mItemsAdapter.clear();
             mItems.addAll(items);
             mItemsAdapter.notifyDataSetChanged();
+            lpiLoading.setVisibility(View.GONE);
         });
     }
 

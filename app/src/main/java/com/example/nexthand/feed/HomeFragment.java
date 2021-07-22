@@ -36,7 +36,7 @@ import java.util.List;
 
 import permissions.dispatcher.NeedsPermission;
 
-public class HomeFragment extends Fragment implements ItemsAdapter.onClickListener{
+public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListener{
 
     public static final String TAG = "HomeFragment";
     private static final int QUERY_LIMIT = 20;

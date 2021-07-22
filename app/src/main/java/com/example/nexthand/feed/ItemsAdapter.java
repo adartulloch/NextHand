@@ -22,15 +22,15 @@ import java.util.List;
 
 public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder>{
 
-    public interface onClickListener {
+    public interface OnClickListener {
         void onItemClicked(int position);
     }
 
-    private onClickListener onClickListener;
+    private OnClickListener onClickListener;
     private Context mContext;
     private List<Item> items;
 
-    public ItemsAdapter(Context mContext, List<Item> items, onClickListener onClickListener) {
+    public ItemsAdapter(Context mContext, List<Item> items, OnClickListener onClickListener) {
         this.mContext = mContext;
         this.items = items;
         this.onClickListener = onClickListener;

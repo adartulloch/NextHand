@@ -26,14 +26,14 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder>{
         void onItemClicked(int position);
     }
 
-    private OnClickListener onClickListener;
+    private OnClickListener mOnClickListener;
     private Context mContext;
-    private List<Item> items;
+    private List<Item> mItems;
 
-    public ItemsAdapter(Context mContext, List<Item> items, OnClickListener onClickListener) {
-        this.mContext = mContext;
-        this.items = items;
-        this.onClickListener = onClickListener;
+    public ItemsAdapter(Context context, List<Item> items, OnClickListener onClickListener) {
+        this.mContext = context;
+        this.mItems = items;
+        this.mOnClickListener = onClickListener;
     }
 
     @NonNull
@@ -46,17 +46,17 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder>{
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull ItemsAdapter.ViewHolder holder, int position) {
-        Item item = items.get(position);
+        Item item = mItems.get(position);
         holder.bind(item);
     }
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return mItems.size();
     }
 
     public void clear() {
-        items.clear();
+        mItems.clear();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -69,7 +69,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder>{
             ivPost = itemView.findViewById(R.id.ivPost);
             tvTitle = itemView.findViewById(R.id.tvTitle);
             itemView.setOnClickListener(v -> {
-                onClickListener.onItemClicked(getAdapterPosition());
+                mOnClickListener.onItemClicked(getAdapterPosition());
             });
         }
 

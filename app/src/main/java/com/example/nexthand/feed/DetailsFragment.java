@@ -1,5 +1,6 @@
 package com.example.nexthand.feed;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -16,17 +17,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.nexthand.R;
+import com.example.nexthand.models.Inquiry;
 import com.example.nexthand.models.Item;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.Parse;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseUser;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -42,6 +46,7 @@ public class DetailsFragment extends Fragment {
     public static final String TAG = "DetailsFragment";
 
     private Item mItem;
+    private Context mContext;
     private ImageView mIvProfile;
     private TextView mTvName;
     private TextView mTvDescription;
@@ -95,6 +100,7 @@ public class DetailsFragment extends Fragment {
             mLocation = args.getParcelable(Item.KEY_LOCATION);
         }
 
+        mContext = getContext();
         mIvProfile = (ImageView) view.findViewById(R.id.ivProfile);
         mTvName = (TextView) view.findViewById(R.id.tvName);
         mTvDescription = (TextView) view.findViewById(R.id.tvDescription);
@@ -122,7 +128,27 @@ public class DetailsFragment extends Fragment {
         mTvName.setText(mItem.getTitle());
         mTvDescription.setText(mItem.getCaption());
         mTvMilesAway.setText(mItem.milesAway(new ParseGeoPoint(mLocation.getLatitude(), mLocation.getLongitude())));
+        mFab.setText("Inquire " + mItem.getAuthor().getUsername());
+        mFab.setOnClickListener(v -> {
+            sendInquiry(mItem);
+        });
 
         return view;
+    }
+
+    private void sendInquiry(Item item) {
+        Inquiry inquiry = new Inquiry();
+        inquiry.setItem(item);
+        inquiry.setSender(ParseUser.getCurrentUser());
+        inquiry.setRecipient(item.getAuthor());
+
+        inquiry.saveInBackground(e -> {
+            if (e == null) {
+                Toast.makeText(mContext, "You made an inquiry about the item", Toast.LENGTH_SHORT).show();
+            } else {
+                Log.e(TAG, "Failed to save", e);
+            }
+        });
+
     }
 }

@@ -36,15 +36,12 @@ public class ProfileFragment extends Fragment implements InquiriesAdapter.OnClic
     @Override
     public View onCreateView(@NonNull @org.jetbrains.annotations.NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
-
         mContext = getContext();
         mInquiries = new ArrayList();
         mRvInquiries = view.findViewById(R.id.rvInquiries);
         mInquiriesAdapter = new InquiriesAdapter(mContext, mInquiries, this);
-
         mRvInquiries.setAdapter(mInquiriesAdapter);
         mRvInquiries.setLayoutManager(new LinearLayoutManager(mContext));
-
         getInquiries();
         return view;
     }
@@ -54,9 +51,6 @@ public class ProfileFragment extends Fragment implements InquiriesAdapter.OnClic
         query.setLimit(QUERY_LIMIT);
         query.include(Inquiry.KEY_SENDER);
         query.include(Inquiry.KEY_SENDER);
-        query.include(Inquiry.KEY_SENDER + ".username");
-        query.include(Inquiry.KEY_RECIPIENT + ".username");
-
         query.whereEqualTo(Inquiry.KEY_RECIPIENT, ParseUser.getCurrentUser());
         query.findInBackground((inquiries, e) -> {
             if (e == null) {

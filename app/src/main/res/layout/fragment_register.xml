@@ -22,7 +22,7 @@
             android:layout_gravity="bottom"
             android:fontFamily="@font/roboto_mono"
             android:gravity="center"
-            android:text="First, we'll need some information about you"
+            android:text="@string/more_info"
             android:textColor="@android:color/black"
             android:textSize="20sp" />
 
@@ -107,12 +107,11 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:text="@string/button_register"
-                app:backgroundTint="#E8B3B3" />
+                android:textColor="@color/black"
+                android:text="@string/button_register" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCancel"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="12dp"
@@ -120,7 +119,7 @@
                 android:layout_toStartOf="@id/btnRegister"
                 android:layout_toLeftOf="@id/btnRegister"
                 android:text="Cancel"
-                android:textColor="#FFFFFF" />
+                android:textColor="@color/black" />
         </RelativeLayout>
     </LinearLayout>
 </ScrollView>

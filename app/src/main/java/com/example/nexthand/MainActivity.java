@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentManager;
 import android.os.Bundle;
 
 import com.example.nexthand.compose.ComposeFragment;
+import com.example.nexthand.contacts.ContactsFragment;
 import com.example.nexthand.feed.HomeFragment;
 import com.example.nexthand.map.MapFragment;
 import com.example.nexthand.profile.ProfileFragment;
@@ -42,6 +43,9 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case R.id.nav_profile:
                         selectedFragment = new ProfileFragment();
+                        break;
+                    case R.id.nav_contacts:
+                        selectedFragment = new ContactsFragment();
                         break;
                 }
                 mFragmentManager.beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();

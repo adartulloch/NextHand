@@ -19,4 +19,9 @@
         android:id="@+id/nav_profile"
         android:icon="@drawable/ic_baseline_person_24"
         android:title="@string/profile" />
+
+    <item
+        android:id="@+id/nav_contacts"
+        android:icon="@drawable/outline_contact_page_black_24dp"
+        android:title="@string/contacts" />
 </menu>

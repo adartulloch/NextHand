@@ -1,8 +1,12 @@
 package com.example.nexthand.compose;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -27,16 +31,20 @@ import android.widget.ToggleButton;
 import com.example.nexthand.MainActivity;
 import com.example.nexthand.R;
 import com.example.nexthand.models.Item;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+
+import permissions.dispatcher.NeedsPermission;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,6 +55,7 @@ public class ComposeFragment extends Fragment {
 
     public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
     public static final String TAG = "ComposeFragment";
+    private Context mContext;
     private File mPhotoFile;
     private EditText mEtTitle;
     private EditText mEtDescription;
@@ -55,6 +64,8 @@ public class ComposeFragment extends Fragment {
     private ImageView mIvPostImage;
     private Switch swDonation;
     public String mPhotoFileName = "photo.jpg";
+    private FusedLocationProviderClient mLocationClient;
+    private Location mLocation;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -107,11 +118,14 @@ public class ComposeFragment extends Fragment {
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mContext = getContext();
         mEtTitle = view.findViewById(R.id.etTitle);
         mFabSubmit = view.findViewById(R.id.fabSubmit);
         mIvPostImage = view.findViewById(R.id.ivPostImage);
         mBtnCaptureImage = view.findViewById(R.id.btnCaptureImage);
         mEtDescription = view.findViewById(R.id.etDescription);
+        mLocationClient = new FusedLocationProviderClient(mContext);
+        getMyLocation();
         swDonation = view.findViewById(R.id.swDonation);
 
         mBtnCaptureImage.setOnClickListener(v -> launchCamera());
@@ -130,11 +144,28 @@ public class ComposeFragment extends Fragment {
             }
             Boolean isDonation = swDonation.isChecked();
             ParseUser currentUser = ParseUser.getCurrentUser();
-            savePost(title, description, currentUser, mPhotoFile, isDonation);
+            savePost(title, description, currentUser, mPhotoFile, isDonation, mLocation);
         });
     }
 
+    @SuppressLint("MissingPermission")
+    @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+    private void getMyLocation() {
+        mLocationClient.getLastLocation()
+                .addOnSuccessListener(location -> {
+                    if (location != null) {
+                        mLocation = location;
+                    } else {
+                        Log.i(TAG, "Location is null");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG,"Unable to get the user's location", e);
+                });
+    }
+
     private void launchCamera() {
+        mPhotoFile = getPhotoFileUri(mPhotoFileName);
         Uri fileProvider = FileProvider.getUriForFile(getContext(),
                 "com.nexthand.fileprovider",
                 getPhotoFileUri(mPhotoFileName));
@@ -167,14 +198,15 @@ public class ComposeFragment extends Fragment {
         }
     }
 
-    private void savePost(String title, String caption, ParseUser currentUser, File photoFile, Boolean isDonation) {
+    private void savePost(String title, String caption, ParseUser currentUser, File photoFile, Boolean isDonation, Location location) {
         Item item = new Item();
         item.setTitle(title);
         item.setCaption(caption);
         item.setAuthor(currentUser);
         item.setImage(new ParseFile(photoFile));
         item.setDonation(isDonation);
-        item.setIsAvailable(false);
+        item.setIsAvailable(true);
+        item.setLocation(new ParseGeoPoint(location.getLatitude(), location.getLongitude()));
         item.saveInBackground(e -> {
             if (e != null) {
                 Log.e(TAG, "Error while saving " + e);

@@ -67,16 +67,24 @@ public class InquiriesAdapter extends RecyclerView.Adapter<InquiriesAdapter.View
 
         private ImageView ivPost;
         private TextView tvName;
+        private TextView tvBody;
         private Button btnAccept;
         private Button btnCancel;
 
         public ViewHolder(@NotNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tvName);
+            tvBody = itemView.findViewById(R.id.tvBody);
         }
 
         public void bind(Inquiry inquiry) {
+            String itemTitle = inquiry.getItem().getString(Item.KEY_TITLE);
+            Boolean isDonation = inquiry.getItem().getBoolean(Item.KEY_ISDONATION);
+
             tvName.setText(inquiry.getSender().getUsername());
+            String body = isDonation ? itemView.getResources().getString(R.string.donation_inquiry, itemTitle) :
+                    itemView.getResources().getString(R.string.borrow_inquiry, itemTitle);
+            tvBody.setText(body);
         }
     }
 }

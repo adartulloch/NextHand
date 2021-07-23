@@ -11,6 +11,8 @@
     <string name="action_sign_up">Sign up</string>
     <string name="welcome">Hello, %1$s!</string>
     <string name="inquire_user">Inquire %1$s</string>
+    <string name="borrow_inquiry">Would like to borrow your %1$s</string>
+    <string name="donation_inquiry">Is interested in your %1$s</string>
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
@@ -21,4 +23,5 @@
     <string name="button_register">register</string>
     <string name="nexthand">NextHand</string>
     <string name="slogan">find &amp; share items for a wasteless future</string>
+    <string name="contacts">Contacts</string>
 </resources>

@@ -127,6 +127,7 @@ public class DetailsFragment extends Fragment {
         mTvName.setText(mItem.getTitle());
         mTvDescription.setText(mItem.getCaption());
         mTvMilesAway.setText(mItem.milesAway(new ParseGeoPoint(mLocation.getLatitude(), mLocation.getLongitude())));
+        if (mItem.getAuthor().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) { mFab.setVisibility(View.GONE); }
         mFab.setText(getString(R.string.inquire_user, mItem.getAuthor().getUsername()));
         mFab.setOnClickListener(v -> {
             sendInquiry(mItem);

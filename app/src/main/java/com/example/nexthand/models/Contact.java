@@ -8,6 +8,7 @@ import java.io.Serializable;
 
 @ParseClassName("Contact")
 public class Contact extends ParseObject implements Serializable {
+    public static final String TAG = "Contact";
     public static final String KEY_USER = "user";
     public static final String KEY_RECIPIENT = "recipient";
 

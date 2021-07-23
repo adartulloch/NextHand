@@ -3,6 +3,7 @@ package com.example.nexthand.profile;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +17,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.nexthand.R;
 import com.example.nexthand.launch.LoginActivity;
+import com.example.nexthand.models.Contact;
 import com.example.nexthand.models.Inquiry;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,7 +84,18 @@ public class ProfileFragment extends Fragment implements InquiriesAdapter.OnClic
 
     @Override
     public void onInquiryAccepted(int position) {
-        //TODO
+        //TODO: Create a new Contact pointing to the inquiry sender
+        Contact contact = new Contact();
+        contact.setUser(mInquiries.get(position).getSender());
+        contact.setRecipient(ParseUser.getCurrentUser());
+        contact.saveInBackground(e -> {
+            if (e == null) {
+                Log.i(TAG,"Saved contact successfully for " + mInquiries.get(position).getSender().getUsername());
+            }
+        });
+        //TODO: Clear RV at position
+
+        //TODO: Remove item from DB
     }
 
     @Override

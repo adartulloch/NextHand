@@ -16,7 +16,7 @@ public class Item extends ParseObject implements Serializable {
     public static final String KEY_AUTHOR = "author";
     public static final String KEY_IMAGE = "image";
     public static final String KEY_CAPTION = "caption";
-    public static final String KEY_ISDONATION = "donation";
+    public static final String KEY_ISDONATION = "isDonation";
     public static final String KEY_LOCATION = "location";
     public static final String KEY_INQUIRIES = "inquiries";
     public static final String KEY_CATEGORY = "category";

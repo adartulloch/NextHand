@@ -144,7 +144,7 @@ public class RegisterFragment extends Fragment {
 
     private void goMainActivity() {
         Intent i = new Intent(mContext, MainActivity.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         startActivity(i);
+        getActivity().finish();
     }
 }

@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,9 +20,11 @@ import com.example.nexthand.R;
 import com.example.nexthand.launch.LoginActivity;
 import com.example.nexthand.models.Contact;
 import com.example.nexthand.models.Inquiry;
+import com.example.nexthand.models.Item;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -82,24 +85,64 @@ public class ProfileFragment extends Fragment implements InquiriesAdapter.OnClic
         });
     }
 
+    /***
+     * Deletes an inquiry and its associated item from the DB.
+     * Asynchronously deletes an inquiry which triggers another async call to delete its item.
+     * @param position
+     */
     @Override
     public void onInquiryAccepted(int position) {
-        //TODO: Create a new Contact pointing to the inquiry sender
-        Contact contact = new Contact();
-        contact.setUser(mInquiries.get(position).getSender());
-        contact.setRecipient(ParseUser.getCurrentUser());
-        contact.saveInBackground(e -> {
-            if (e == null) {
-                Log.i(TAG,"Saved contact successfully for " + mInquiries.get(position).getSender().getUsername());
-            }
-        });
-        //TODO: Clear RV at position
-
-        //TODO: Remove item from DB
+            Contact contact = new Contact();
+            contact.setUser(mInquiries.get(position).getSender());
+            contact.setRecipient(ParseUser.getCurrentUser());
+            contact.saveInBackground(e -> {
+                if (e == null) {
+                    Log.i(TAG, "Saved contact successfully for " + mInquiries.get(position).getSender().getUsername());
+                    Inquiry removed = mInquiries.get(position);
+                    mInquiries.remove(position);
+                    mInquiriesAdapter.notifyItemRemoved(position);
+                    deleteInquiry(removed, true);
+                }
+            });
     }
 
     @Override
     public void onInquiryCanceled(int position) {
-        //TODO
+        Inquiry removed = mInquiries.get(position);
+        mInquiries.remove(position);
+        mInquiriesAdapter.notifyItemRemoved(position);
+        deleteInquiry(removed, false);
+    }
+
+    public void deleteItem(ParseObject object) {
+        ParseQuery<Item> query = ParseQuery.getQuery(Item.class);
+        query.getInBackground(object.getObjectId(), (item, e) -> {
+            if (e == null) {
+                item.deleteInBackground(e2 -> {
+                    if(e2 !=null){
+                        Toast.makeText(mContext, "Error: "+e2.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }else{
+                Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void deleteInquiry(ParseObject object, Boolean itemIsToBeDeleted) {
+        ParseQuery<Inquiry> query = ParseQuery.getQuery(Inquiry.class);
+        query.getInBackground(object.getObjectId(), (inquiry, e) -> {
+            if (e == null) {
+                inquiry.deleteInBackground(e2 -> {
+                    if(e2==null){
+                       if (itemIsToBeDeleted) deleteItem(inquiry.getItem());
+                    }else{
+                        Toast.makeText(mContext, "Error: "+e2.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }else{
+                Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

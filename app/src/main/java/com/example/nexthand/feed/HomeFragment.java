@@ -3,40 +3,40 @@ package com.example.nexthand.feed;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.nexthand.R;
+import com.example.nexthand.models.Inquiry;
 import com.example.nexthand.models.Item;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
-import com.parse.FindCallback;
-import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-
 import org.jetbrains.annotations.NotNull;
-
-import java.io.Serializable;
+import org.json.JSONArray;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-
 import permissions.dispatcher.NeedsPermission;
 
-public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListener{
+public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListener {
 
     public static final String TAG = "HomeFragment";
     private static final int QUERY_LIMIT = 20;
@@ -61,6 +61,7 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
         mRvItems.setAdapter(mItemsAdapter);
         mLocationClient = new FusedLocationProviderClient(mContext);
         mRvItems.setLayoutManager(new LinearLayoutManager(mContext));
+        getItemTouchHelper().attachToRecyclerView(mRvItems);
         sendQuery();
         return view;
     }
@@ -86,8 +87,9 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
         ParseQuery<Item> query = ParseQuery.getQuery(Item.class);
         query.setLimit(QUERY_LIMIT);
         query.include(Item.KEY_AUTHOR);
-        query.whereEqualTo(Item.KEY_ISAVAILABLE, true);
-        query.whereWithinMiles(Item.KEY_LOCATION,  new ParseGeoPoint(mLocation.getLatitude(), mLocation.getLongitude()),Integer.MAX_VALUE);
+        query.whereNotEqualTo(Item.KEY_AUTHOR, ParseUser.getCurrentUser());
+        query.whereNotContainedIn(Item.KEY_USERS_INQUIRED, Collections.singleton(ParseUser.getCurrentUser()));
+        query.whereWithinMiles(Item.KEY_LOCATION,  new ParseGeoPoint(mLocation.getLatitude(), mLocation.getLongitude()),3000);
         query.findInBackground((items, e) -> {
             if (e != null) {
                 Log.e(TAG, "Error fetching items!", e);
@@ -117,5 +119,97 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
                 .replace(R.id.fragment_container, details)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    private ItemTouchHelper getItemTouchHelper() {
+        return new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(@NonNull @NotNull RecyclerView recyclerView, @NonNull @NotNull RecyclerView.ViewHolder viewHolder, @NonNull @NotNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull @NotNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                Item swipedItem = mItems.get(position);
+                switch (direction) {
+                    case ItemTouchHelper.LEFT:
+                        sendInquiry(swipedItem);
+                        updateItem(swipedItem);
+                        mItems.remove(position);
+                        mItemsAdapter.notifyItemRemoved(position);
+                        break;
+                }
+            }
+
+            @Override
+            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+
+                Drawable icon = ContextCompat.getDrawable(mContext,
+                        R.drawable.outline_waving_hand_black_24dp);
+                ColorDrawable background = new ColorDrawable(Color.CYAN);
+
+                View itemView = viewHolder.itemView;
+                int backgroundCornerOffset = 20; //so background is behind the rounded corners of itemView
+
+                int iconMargin = (itemView.getHeight() - icon.getIntrinsicHeight()) / 2;
+                int iconTop = itemView.getTop() + (itemView.getHeight() - icon.getIntrinsicHeight()) / 2;
+                int iconBottom = iconTop + icon.getIntrinsicHeight();
+
+                if (dX > 0) { // Swiping to the right
+                    int iconLeft = itemView.getLeft() + iconMargin + icon.getIntrinsicWidth();
+                    int iconRight = itemView.getLeft() + iconMargin;
+                    icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
+
+                    background.setBounds(itemView.getLeft(), itemView.getTop(),
+                            itemView.getLeft() + ((int) dX) + backgroundCornerOffset, itemView.getBottom());
+                } else if (dX < 0) { // Swiping to the left
+                    int iconLeft = itemView.getRight() - iconMargin - icon.getIntrinsicWidth();
+                    int iconRight = itemView.getRight() - iconMargin;
+                    icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
+
+                    background.setBounds(itemView.getRight() + ((int) dX) - backgroundCornerOffset,
+                            itemView.getTop(), itemView.getRight(), itemView.getBottom());
+                } else { // view is unSwiped
+                    icon.setBounds(0, 0, 0, 0);
+                    background.setBounds(0, 0, 0, 0);
+                }
+
+                background.draw(c);
+                icon.draw(c);
+            }
+        });
+    }
+
+    private void sendInquiry(Item item) {
+        Inquiry inquiry = new Inquiry();
+        inquiry.setItem(item);
+        inquiry.setSender(ParseUser.getCurrentUser());
+        inquiry.setRecipient(item.getAuthor());
+        inquiry.saveInBackground(e -> {
+            if (e == null) {
+                Toast.makeText(mContext, "You have successfully placed an inquiry about the item", Toast.LENGTH_SHORT).show();
+            } else {
+                Log.e(TAG, "Failed to save", e);
+            }
+        });
+    }
+
+    private void updateItem(Item item) {
+        ParseQuery<Item> query = ParseQuery.getQuery(Item.class);
+        query.getInBackground(item.getObjectId(), (object, e) -> {
+            if (e == null) {
+                JSONArray arr = object.getJSONArray(Item.KEY_USERS_INQUIRED);
+                if (arr == null) {
+                    arr = new JSONArray(); //Default value is not an empty JSONArray
+                }
+                arr.put(ParseUser.getCurrentUser());
+                object.put(Item.KEY_USERS_INQUIRED, arr);
+                object.saveInBackground();
+            } else {
+                Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

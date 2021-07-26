@@ -29,8 +29,15 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.Parse;
+import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+
+import org.json.JSONArray;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -130,22 +137,40 @@ public class DetailsFragment extends Fragment {
         if (mItem.getAuthor().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) { mFab.setVisibility(View.GONE); }
         mFab.setText(getString(R.string.inquire_user, mItem.getAuthor().getUsername()));
         mFab.setOnClickListener(v -> {
-            sendInquiry(mItem);
+            sendInquiry();
+            updateItem();
         });
 
         return view;
     }
 
-    private void sendInquiry(Item item) {
+    private void sendInquiry() {
         Inquiry inquiry = new Inquiry();
-        inquiry.setItem(item);
+        inquiry.setItem(mItem);
         inquiry.setSender(ParseUser.getCurrentUser());
-        inquiry.setRecipient(item.getAuthor());
+        inquiry.setRecipient(mItem.getAuthor());
         inquiry.saveInBackground(e -> {
             if (e == null) {
                 Toast.makeText(mContext, "You have successfully placed an inquiry about the item", Toast.LENGTH_SHORT).show();
             } else {
                 Log.e(TAG, "Failed to save", e);
+            }
+        });
+    }
+
+    private void updateItem() {
+        ParseQuery<Item> query = ParseQuery.getQuery(Item.class);
+        query.getInBackground(mItem.getObjectId(), (item, e) -> {
+            if (e == null) {
+                JSONArray arr = item.getJSONArray(Item.KEY_USERS_INQUIRED);
+                if (arr == null) {
+                    arr = new JSONArray(); //Default value is not an empty JSONArray
+                }
+                arr.put(ParseUser.getCurrentUser());
+                item.put(Item.KEY_USERS_INQUIRED, arr);
+                item.saveInBackground();
+            } else {
+                Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

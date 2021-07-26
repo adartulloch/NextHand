@@ -21,8 +21,9 @@ public class Item extends ParseObject implements Serializable {
     public static final String KEY_INQUIRIES = "inquiries";
     public static final String KEY_CATEGORY = "category";
     public static final String KEY_ISAVAILABLE = "isAvailable";
+    public static final String KEY_USERS_INQUIRED = "users_inquired";
 
-    public Item() {}
+     public Item() {}
 
     public String getTitle() {
         return getString(KEY_TITLE);

@@ -182,7 +182,9 @@ public class ProfileFragment extends Fragment implements InquiriesAdapter.OnClic
             contact.setRecipient(ParseUser.getCurrentUser());
             contact.saveInBackground(e -> {
                 if (e == null) {
-                    Log.i(TAG, "Saved contact successfully for " + mInquiries.get(position).getSender().getUsername());
+                    Toast.makeText(mContext,
+                             mInquiries.get(position).getSender().getUsername() + " has been saved as a contact!",
+                            Toast.LENGTH_SHORT).show();
                     Inquiry removed = mInquiries.get(position);
                     mInquiries.remove(position);
                     mInquiriesAdapter.notifyItemRemoved(position);

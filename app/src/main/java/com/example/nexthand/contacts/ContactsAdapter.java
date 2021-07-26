@@ -20,6 +20,9 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.nexthand.R;
 import com.example.nexthand.models.Contact;
+import com.example.nexthand.models.User;
+import com.parse.ParseFile;
+import com.parse.ParseUser;
 
 import java.util.List;
 
@@ -94,8 +97,8 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.VH> {
                 @Override
                 public void onLoadCleared(@Nullable @org.jetbrains.annotations.Nullable Drawable placeholder) { }
             };
-            //TODO: Load profile pic into ivProfile, something like
-            // Glide.with(mContext).asBitmap().load(contact.getUser().getProfilePhoto()).centerCrop().into(target));
+            String username = contact.getUser().getUsername();
+            Glide.with(mContext).asBitmap().load(contact.getUser().getParseFile(User.KEY_PROFILEPIC).getUrl()).centerCrop().into(target);
         }
     }
 }

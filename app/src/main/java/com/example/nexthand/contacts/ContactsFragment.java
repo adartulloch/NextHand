@@ -16,6 +16,7 @@ import com.example.nexthand.feed.DetailsFragment;
 import com.example.nexthand.feed.ItemsAdapter;
 import com.example.nexthand.models.Contact;
 import com.example.nexthand.models.Item;
+import com.example.nexthand.models.User;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.parse.FindCallback;
 import com.parse.ParseException;

@@ -18,6 +18,7 @@ import com.example.nexthand.feed.ItemsAdapter;
 import com.example.nexthand.models.Inquiry;
 import com.example.nexthand.models.Item;
 import com.example.nexthand.models.User;
+import com.parse.ParseFile;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -65,7 +66,7 @@ public class InquiriesAdapter extends RecyclerView.Adapter<InquiriesAdapter.View
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        private ImageView ivPost;
+        private ImageView ivProfilePic;
         private TextView tvName;
         private TextView tvBody;
         private Button btnAccept;
@@ -73,6 +74,7 @@ public class InquiriesAdapter extends RecyclerView.Adapter<InquiriesAdapter.View
 
         public ViewHolder(@NotNull View itemView) {
             super(itemView);
+            ivProfilePic = itemView.findViewById(R.id.ivProfilePic);
             tvName = itemView.findViewById(R.id.tvName);
             tvBody = itemView.findViewById(R.id.tvBody);
             btnAccept = itemView.findViewById(R.id.btnAccept);
@@ -86,6 +88,11 @@ public class InquiriesAdapter extends RecyclerView.Adapter<InquiriesAdapter.View
             String body = isDonation ? itemView.getResources().getString(R.string.donation_inquiry, itemTitle) :
                     itemView.getResources().getString(R.string.borrow_inquiry, itemTitle);
             tvBody.setText(body);
+            ParseFile photo = inquiry.getSender().getParseFile(User.KEY_PROFILEPIC);
+            Glide.with(mContext)
+                    .load(inquiry.getSender().getParseFile(User.KEY_PROFILEPIC).getUrl())
+                    .circleCrop()
+                    .into(ivProfilePic);
             btnAccept.setOnClickListener(v -> mOnClickListener.onInquiryAccepted(getAdapterPosition()));
             btnCancel.setOnClickListener(v -> mOnClickListener.onInquiryCanceled(getAdapterPosition()));
         }

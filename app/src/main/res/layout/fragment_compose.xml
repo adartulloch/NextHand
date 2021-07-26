@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:layout_margin="16dp"
+    android:orientation="vertical"
     tools:context=".compose.ComposeFragment">
 
     <com.google.android.material.textfield.TextInputLayout
@@ -41,14 +41,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Take Picture"
-        app:srcCompat="@drawable/ic_launch_nexthand"
-        android:textColor="@color/black" />
+        android:textColor="@color/black"
+        app:srcCompat="@drawable/ic_launch_nexthand" />
 
     <ImageView
         android:id="@+id/ivPostImage"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-
         app:srcCompat="@drawable/ic_launch_nexthand"
         tools:srcCompat="@drawable/ic_launch_nexthand" />
 
@@ -62,20 +61,16 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/fabSubmit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
             android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
             android:layout_marginBottom="15dp"
             android:text="Post Item"
             android:theme="@style/Theme.MaterialComponents.NoActionBar"
             app:icon="@drawable/outline_done_white_24dp" />
     </RelativeLayout>
-
-
-
-
-
 </LinearLayout>

@@ -125,7 +125,6 @@ public class ComposeFragment extends Fragment {
         mBtnCaptureImage = view.findViewById(R.id.btnCaptureImage);
         mEtDescription = view.findViewById(R.id.etDescription);
         mLocationClient = new FusedLocationProviderClient(mContext);
-        getMyLocation();
         swDonation = view.findViewById(R.id.swDonation);
 
         mBtnCaptureImage.setOnClickListener(v -> launchCamera());
@@ -144,17 +143,18 @@ public class ComposeFragment extends Fragment {
             }
             Boolean isDonation = swDonation.isChecked();
             ParseUser currentUser = ParseUser.getCurrentUser();
-            savePost(title, description, currentUser, mPhotoFile, isDonation, mLocation);
+            getMyLocationAndPost(title, description, currentUser, isDonation);
         });
     }
 
     @SuppressLint("MissingPermission")
     @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
-    private void getMyLocation() {
+    private void getMyLocationAndPost(String title, String description, ParseUser currentUser, Boolean isDonation) {
         mLocationClient.getLastLocation()
                 .addOnSuccessListener(location -> {
                     if (location != null) {
                         mLocation = location;
+                        savePost(title, description, currentUser, mPhotoFile, isDonation, mLocation);
                     } else {
                         Log.i(TAG, "Location is null");
                     }
@@ -214,7 +214,9 @@ public class ComposeFragment extends Fragment {
             }
             Log.i(TAG, "Post save was successful!");
             mEtDescription.setText("");
+            mEtTitle.setText("");
             mIvPostImage.setImageResource(0);
+            Toast.makeText(mContext, "Your item has been posted!", Toast.LENGTH_SHORT).show();
         });
     }
 }

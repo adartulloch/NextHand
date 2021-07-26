@@ -2,33 +2,39 @@ package com.example.nexthand.profile;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import com.bumptech.glide.Glide;
 import com.example.nexthand.R;
 import com.example.nexthand.launch.LoginActivity;
 import com.example.nexthand.models.Contact;
 import com.example.nexthand.models.Inquiry;
 import com.example.nexthand.models.Item;
+import com.example.nexthand.models.User;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
-import com.parse.FindCallback;
-import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
-
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,9 +44,14 @@ public class ProfileFragment extends Fragment implements InquiriesAdapter.OnClic
 
     private Context mContext;
     private TextView mTvWelcome;
+    private ImageView mIvProfileImage;
+    private Button btnEditProfilePic;
     private RecyclerView mRvInquiries;
     private InquiriesAdapter mInquiriesAdapter;
     private ExtendedFloatingActionButton mFabLogout;
+    private File mProfilePic;
+    private String mPhotoFileName = "profile.jpg";
+    private final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 24;
     private List<Inquiry> mInquiries;
 
     @Nullable
@@ -50,9 +61,14 @@ public class ProfileFragment extends Fragment implements InquiriesAdapter.OnClic
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         mContext = getContext();
         mTvWelcome = view.findViewById(R.id.tvWelcome);
+        mIvProfileImage = view.findViewById(R.id.ivProfileImage);
+        setProfilePic();
+        btnEditProfilePic = view.findViewById(R.id.btnEditProfilePic);
+        btnEditProfilePic.setOnClickListener(v -> {
+            launchCamera();
+        });
         mFabLogout = view.findViewById(R.id.fabLogout);
         mFabLogout.setOnClickListener(v -> {
-            //User will logout of the application
             ParseUser currentUser = ParseUser.getCurrentUser();
             currentUser.logOut();
             Intent i = new Intent(getContext(), LoginActivity.class);
@@ -67,6 +83,75 @@ public class ProfileFragment extends Fragment implements InquiriesAdapter.OnClic
         mRvInquiries.setLayoutManager(new LinearLayoutManager(mContext));
         getInquiries();
         return view;
+    }
+
+    private void setProfilePic() {
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
+        query.findInBackground((users, e) -> {
+            if (e == null) {
+                for(ParseUser user1 : users) {
+                    Glide.with(mContext)
+                            .load(user1.getParseFile(User.KEY_PROFILEPIC).getUrl())
+                            .circleCrop()
+                            .into(mIvProfileImage);
+                }
+            } else {
+                Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void launchCamera() {
+        mProfilePic = getPhotoFileUri(mPhotoFileName);
+        Uri fileProvider = FileProvider.getUriForFile(getContext(),
+                "com.nexthand.fileprovider",
+                getPhotoFileUri(mPhotoFileName));
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
+        if (intent.resolveActivity(getContext().getPackageManager()) != null) {
+            startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+        }
+    }
+
+    private File getPhotoFileUri(String fileName) {
+        File mediaStorageDir = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
+        if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()){
+            Log.d(TAG, "failed to create directory");
+        }
+        File file = new File(mediaStorageDir.getPath() + File.separator + fileName);
+        return file;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == getActivity().RESULT_OK) {
+                Bitmap takenImage = BitmapFactory.decodeFile(mProfilePic.getAbsolutePath());
+                Glide.with(mContext)
+                        .load(takenImage)
+                        .circleCrop()
+                        .into(mIvProfileImage);
+                saveProfilePic();
+            } else {
+                Toast.makeText(getContext(), "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void saveProfilePic() {
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        if (currentUser != null) {
+            currentUser.put("profilePic", new ParseFile(mProfilePic));
+            currentUser.saveInBackground(e -> {
+                if(e==null){
+                    Toast.makeText(mContext, "Updated your profile pic!", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     private void getInquiries() {

@@ -19,11 +19,31 @@
         tools:text="Welcome, Adar"
          />
 
+    <ImageView
+        android:id="@+id/ivProfileImage"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_below="@+id/tvWelcome"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <Button
+        android:id="@+id/btnEditProfilePic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ivProfileImage"
+        android:layout_centerHorizontal="true"
+        android:text="Edit profile picture"
+        android:textAllCaps="false"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        />
+
     <TextView
         android:id="@+id/tvViewInquiries"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tvWelcome"
+        android:layout_below="@+id/btnEditProfilePic"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="5dp"
         android:textColor="@color/black"
@@ -34,9 +54,9 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvInquiries"
         android:layout_width="match_parent"
-        android:layout_height="500dp"
+        android:layout_height="405dp"
         android:layout_below="@+id/tvViewInquiries"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="15dp"
         android:padding="5dp" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton

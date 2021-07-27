@@ -23,8 +23,10 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.nexthand.R;
+import com.example.nexthand.feed.util.InquirySender;
 import com.example.nexthand.models.Inquiry;
 import com.example.nexthand.models.Item;
+import com.example.nexthand.models.User;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -54,10 +56,12 @@ public class DetailsFragment extends Fragment {
 
     private Item mItem;
     private Context mContext;
-    private ImageView mIvProfile;
+    private ImageView mIvItem;
     private TextView mTvName;
     private TextView mTvDescription;
     private TextView mTvMilesAway;
+    private ImageView mIvProfileImage;
+    private InquirySender mInquirySender;
     private View mVPalette;
     private Location mLocation;
     private ExtendedFloatingActionButton mFab;
@@ -108,17 +112,19 @@ public class DetailsFragment extends Fragment {
         }
 
         mContext = getContext();
-        mIvProfile = view.findViewById(R.id.ivProfile);
+        mIvItem = view.findViewById(R.id.ivItem);
         mTvName = view.findViewById(R.id.tvName);
         mTvDescription = view.findViewById(R.id.tvDescription);
         mVPalette = view.findViewById(R.id.vPalette);
         mTvMilesAway = view.findViewById(R.id.tvMilesAway);
+        mInquirySender = new InquirySender(mItem, mContext);
+        mIvProfileImage = view.findViewById(R.id.ivProfileImage);
         mFab = view.findViewById(R.id.fabInquiry);
 
         CustomTarget<Bitmap> target = new CustomTarget<Bitmap>() {
             @Override
             public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                Glide.with(getActivity()).load(resource).into(mIvProfile);
+                Glide.with(getActivity()).load(resource).into(mIvItem);
                 Palette palette = Palette.from(resource).generate();
                 Palette.Swatch vibrant = palette.getLightMutedSwatch();
                 if (vibrant != null) {
@@ -131,47 +137,13 @@ public class DetailsFragment extends Fragment {
             public void onLoadCleared(@Nullable Drawable placeholder) {}
         };
         Glide.with(this).asBitmap().load(mItem.getImage().getUrl()).centerCrop().into(target);
+        //Glide.with(mContext).load(mItem.getAuthor().getParseFile(User.KEY_PROFILE_IMAGE).getUrl()).circleCrop().into(mIvProfileImage);
         mTvName.setText(mItem.getTitle());
         mTvDescription.setText(mItem.getCaption());
         mTvMilesAway.setText(mItem.milesAway(new ParseGeoPoint(mLocation.getLatitude(), mLocation.getLongitude())));
         if (mItem.getAuthor().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) { mFab.setVisibility(View.GONE); }
         mFab.setText(getString(R.string.inquire_user, mItem.getAuthor().getUsername()));
-        mFab.setOnClickListener(v -> {
-            sendInquiry();
-            updateItem();
-        });
-
+        mFab.setOnClickListener(v -> { mInquirySender.send(); });
         return view;
-    }
-
-    private void sendInquiry() {
-        Inquiry inquiry = new Inquiry();
-        inquiry.setItem(mItem);
-        inquiry.setSender(ParseUser.getCurrentUser());
-        inquiry.setRecipient(mItem.getAuthor());
-        inquiry.saveInBackground(e -> {
-            if (e == null) {
-                Toast.makeText(mContext, "You have successfully placed an inquiry about the item", Toast.LENGTH_SHORT).show();
-            } else {
-                Log.e(TAG, "Failed to save", e);
-            }
-        });
-    }
-
-    private void updateItem() {
-        ParseQuery<Item> query = ParseQuery.getQuery(Item.class);
-        query.getInBackground(mItem.getObjectId(), (item, e) -> {
-            if (e == null) {
-                JSONArray arr = item.getJSONArray(Item.KEY_USERS_INQUIRED);
-                if (arr == null) {
-                    arr = new JSONArray(); //Default value is not an empty JSONArray
-                }
-                arr.put(ParseUser.getCurrentUser());
-                item.put(Item.KEY_USERS_INQUIRED, arr);
-                item.saveInBackground();
-            } else {
-                Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 }

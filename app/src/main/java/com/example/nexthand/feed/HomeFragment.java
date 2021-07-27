@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.nexthand.R;
+import com.example.nexthand.feed.util.InquirySender;
 import com.example.nexthand.models.Inquiry;
 import com.example.nexthand.models.Item;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -46,6 +47,7 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
     private LinearProgressIndicator lpiLoading;
     private RecyclerView mRvItems;
     private FusedLocationProviderClient mLocationClient;
+    private InquirySender mInquirySender;
     private Location mLocation;
 
     @Nullable
@@ -60,6 +62,7 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
         mRvItems = view.findViewById(R.id.rvItems);
         mRvItems.setAdapter(mItemsAdapter);
         mLocationClient = new FusedLocationProviderClient(mContext);
+        mInquirySender = new InquirySender(new Item(), mContext);
         mRvItems.setLayoutManager(new LinearLayoutManager(mContext));
         getItemTouchHelper().attachToRecyclerView(mRvItems);
         sendQuery();
@@ -134,8 +137,8 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
                 Item swipedItem = mItems.get(position);
                 switch (direction) {
                     case ItemTouchHelper.LEFT:
-                        sendInquiry(swipedItem);
-                        updateItem(swipedItem);
+                        mInquirySender.setItem(swipedItem);
+                        mInquirySender.send();
                         mItems.remove(position);
                         mItemsAdapter.notifyItemRemoved(position);
                         break;
@@ -143,7 +146,7 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
             }
 
             @Override
-            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+            public void onChildDraw(@NotNull Canvas c, @NotNull RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
 
                 Drawable icon = ContextCompat.getDrawable(mContext,
@@ -154,17 +157,10 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
                 int backgroundCornerOffset = 20; //so background is behind the rounded corners of itemView
 
                 int iconMargin = (itemView.getHeight() - icon.getIntrinsicHeight()) / 2;
-                int iconTop = itemView.getTop() + (itemView.getHeight() - icon.getIntrinsicHeight()) / 2;
+                int iconTop = itemView.getTop() + iconMargin;
                 int iconBottom = iconTop + icon.getIntrinsicHeight();
 
-                if (dX > 0) { // Swiping to the right
-                    int iconLeft = itemView.getLeft() + iconMargin + icon.getIntrinsicWidth();
-                    int iconRight = itemView.getLeft() + iconMargin;
-                    icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
-
-                    background.setBounds(itemView.getLeft(), itemView.getTop(),
-                            itemView.getLeft() + ((int) dX) + backgroundCornerOffset, itemView.getBottom());
-                } else if (dX < 0) { // Swiping to the left
+                if (dX < 0) { // Swiping to the left
                     int iconLeft = itemView.getRight() - iconMargin - icon.getIntrinsicWidth();
                     int iconRight = itemView.getRight() - iconMargin;
                     icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
@@ -172,43 +168,12 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
                     background.setBounds(itemView.getRight() + ((int) dX) - backgroundCornerOffset,
                             itemView.getTop(), itemView.getRight(), itemView.getBottom());
                 } else { // view is unSwiped
-                    icon.setBounds(0, 0, 0, 0);
+                    icon.setBounds(0, 0, 0, 0); //otherwise icon will still appear on the screen if user cancels swipe
                     background.setBounds(0, 0, 0, 0);
                 }
 
                 background.draw(c);
                 icon.draw(c);
-            }
-        });
-    }
-
-    private void sendInquiry(Item item) {
-        Inquiry inquiry = new Inquiry();
-        inquiry.setItem(item);
-        inquiry.setSender(ParseUser.getCurrentUser());
-        inquiry.setRecipient(item.getAuthor());
-        inquiry.saveInBackground(e -> {
-            if (e == null) {
-                Toast.makeText(mContext, "You have successfully placed an inquiry about the item", Toast.LENGTH_SHORT).show();
-            } else {
-                Log.e(TAG, "Failed to save", e);
-            }
-        });
-    }
-
-    private void updateItem(Item item) {
-        ParseQuery<Item> query = ParseQuery.getQuery(Item.class);
-        query.getInBackground(item.getObjectId(), (object, e) -> {
-            if (e == null) {
-                JSONArray arr = object.getJSONArray(Item.KEY_USERS_INQUIRED);
-                if (arr == null) {
-                    arr = new JSONArray(); //Default value is not an empty JSONArray
-                }
-                arr.put(ParseUser.getCurrentUser());
-                object.put(Item.KEY_USERS_INQUIRED, arr);
-                object.saveInBackground();
-            } else {
-                Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

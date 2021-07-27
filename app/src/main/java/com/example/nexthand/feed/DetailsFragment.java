@@ -137,13 +137,13 @@ public class DetailsFragment extends Fragment {
             public void onLoadCleared(@Nullable Drawable placeholder) {}
         };
         Glide.with(this).asBitmap().load(mItem.getImage().getUrl()).centerCrop().into(target);
-        //Glide.with(mContext).load(mItem.getAuthor().getParseFile(User.KEY_PROFILE_IMAGE).getUrl()).circleCrop().into(mIvProfileImage);
+        Glide.with(mContext).load(mItem.getAuthor().getParseFile(User.KEY_PROFILEPIC).getUrl()).circleCrop().into(mIvProfileImage);
         mTvName.setText(mItem.getTitle());
         mTvDescription.setText(mItem.getCaption());
         mTvMilesAway.setText(mItem.milesAway(new ParseGeoPoint(mLocation.getLatitude(), mLocation.getLongitude())));
         if (mItem.getAuthor().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) { mFab.setVisibility(View.GONE); }
         mFab.setText(getString(R.string.inquire_user, mItem.getAuthor().getUsername()));
-        mFab.setOnClickListener(v -> { mInquirySender.send(); });
+        mFab.setOnClickListener(v -> { InquirySender.send(mContext, mItem, ParseUser.getCurrentUser()); });
         return view;
     }
 }

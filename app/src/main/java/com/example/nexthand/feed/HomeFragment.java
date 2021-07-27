@@ -47,7 +47,6 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
     private LinearProgressIndicator lpiLoading;
     private RecyclerView mRvItems;
     private FusedLocationProviderClient mLocationClient;
-    private InquirySender mInquirySender;
     private Location mLocation;
 
     @Nullable
@@ -62,7 +61,6 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
         mRvItems = view.findViewById(R.id.rvItems);
         mRvItems.setAdapter(mItemsAdapter);
         mLocationClient = new FusedLocationProviderClient(mContext);
-        mInquirySender = new InquirySender(new Item(), mContext);
         mRvItems.setLayoutManager(new LinearLayoutManager(mContext));
         getItemTouchHelper().attachToRecyclerView(mRvItems);
         sendQuery();
@@ -137,8 +135,7 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
                 Item swipedItem = mItems.get(position);
                 switch (direction) {
                     case ItemTouchHelper.LEFT:
-                        mInquirySender.setItem(swipedItem);
-                        mInquirySender.send();
+                        InquirySender.send(mContext, swipedItem, ParseUser.getCurrentUser());
                         mItems.remove(position);
                         mItemsAdapter.notifyItemRemoved(position);
                         break;

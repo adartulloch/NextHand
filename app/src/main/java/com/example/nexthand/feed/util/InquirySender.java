@@ -6,8 +6,11 @@ import android.widget.Toast;
 
 import com.example.nexthand.models.Inquiry;
 import com.example.nexthand.models.Item;
+import com.parse.Parse;
+import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import org.json.JSONArray;
 
@@ -22,42 +25,42 @@ public class InquirySender {
         this.mContext = context;
     }
 
-    public void send() {
-        sendInquiry();
-        updateItem();
+     public static void send(Context context, Item item, ParseUser user) {
+        sendInquiry(context, item, user);
+        updateItem(context, item, user);
     }
 
     public void setItem(Item item) {
         this.mItem = item;
     }
 
-    private void sendInquiry() {
+    private static void sendInquiry(Context context, Item item, ParseUser user) {
         Inquiry inquiry = new Inquiry();
-        inquiry.setItem(mItem);
-        inquiry.setSender(ParseUser.getCurrentUser());
-        inquiry.setRecipient(mItem.getAuthor());
+        inquiry.setItem(item);
+        inquiry.setSender(user);
+        inquiry.setRecipient(item.getAuthor());
         inquiry.saveInBackground(e -> {
             if (e == null) {
-                Toast.makeText(mContext, "You have successfully placed an inquiry about the item", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "You have successfully placed an inquiry about the item", Toast.LENGTH_SHORT).show();
             } else {
                 Log.e(TAG, "Failed to save", e);
             }
         });
     }
 
-    private void updateItem() {
+    private static void updateItem(Context context, Item item, ParseUser user) {
         ParseQuery<Item> query = ParseQuery.getQuery(Item.class);
-        query.getInBackground(mItem.getObjectId(), (object, e) -> {
+        query.getInBackground(item.getObjectId(), (object, e) -> {
             if (e == null) {
                 JSONArray arr = object.getJSONArray(Item.KEY_USERS_INQUIRED);
                 if (arr == null) {
                     arr = new JSONArray(); //Default value is not an empty JSONArray
                 }
-                arr.put(ParseUser.getCurrentUser());
+                arr.put(user);
                 object.put(Item.KEY_USERS_INQUIRED, arr);
                 object.saveInBackground();
             } else {
-                Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

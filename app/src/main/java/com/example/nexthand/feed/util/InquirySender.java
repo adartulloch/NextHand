@@ -17,21 +17,10 @@ import org.json.JSONArray;
 public class InquirySender {
 
     public static final String TAG = "InquirySender";
-    private Item mItem;
-    private Context mContext;
-
-    public InquirySender(Item item, Context context) {
-        this.mItem = item;
-        this.mContext = context;
-    }
 
      public static void send(Context context, Item item, ParseUser user) {
         sendInquiry(context, item, user);
         updateItem(context, item, user);
-    }
-
-    public void setItem(Item item) {
-        this.mItem = item;
     }
 
     private static void sendInquiry(Context context, Item item, ParseUser user) {

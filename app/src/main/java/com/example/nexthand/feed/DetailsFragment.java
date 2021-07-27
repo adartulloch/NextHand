@@ -117,7 +117,6 @@ public class DetailsFragment extends Fragment {
         mTvDescription = view.findViewById(R.id.tvDescription);
         mVPalette = view.findViewById(R.id.vPalette);
         mTvMilesAway = view.findViewById(R.id.tvMilesAway);
-        mInquirySender = new InquirySender(mItem, mContext);
         mIvProfileImage = view.findViewById(R.id.ivProfileImage);
         mFab = view.findViewById(R.id.fabInquiry);
 

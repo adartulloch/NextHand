@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.nexthand.R;
 import com.example.nexthand.feed.util.InquirySender;
+import com.example.nexthand.feed.util.ItemCache;
 import com.example.nexthand.models.Inquiry;
 import com.example.nexthand.models.Item;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -33,8 +35,13 @@ import com.parse.ParseUser;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+
 import permissions.dispatcher.NeedsPermission;
 
 public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListener {
@@ -45,6 +52,7 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
     private List<Item> mItems;
     private ItemsAdapter mItemsAdapter;
     private LinearProgressIndicator lpiLoading;
+    private HashSet<String> mKeys;
     private RecyclerView mRvItems;
     private FusedLocationProviderClient mLocationClient;
     private Location mLocation;
@@ -63,6 +71,7 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
         mLocationClient = new FusedLocationProviderClient(mContext);
         mRvItems.setLayoutManager(new LinearLayoutManager(mContext));
         getItemTouchHelper().attachToRecyclerView(mRvItems);
+        loadItemsFromCache();
         sendQuery();
         return view;
     }
@@ -94,12 +103,33 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
         query.findInBackground((items, e) -> {
             if (e != null) {
                 Log.e(TAG, "Error fetching items!", e);
+            } else {
+                mItemsAdapter.clear();
+                saveItemsToCache(items);
+                mItemsAdapter.notifyDataSetChanged();
+                lpiLoading.setVisibility(View.GONE);
             }
-            mItemsAdapter.clear();
-            mItems.addAll(items);
-            mItemsAdapter.notifyDataSetChanged();
-            lpiLoading.setVisibility(View.GONE);
         });
+    }
+
+    private void saveItemsToCache(List<Item> items) {
+        for (Item item : items) {
+            String KEY = item.getObjectId();
+            if (ItemCache.getInstance().getCache().get(KEY) == null) {
+                ItemCache.getInstance().getCache().put(KEY, item);
+                mItems.add(item);
+            } else {
+                //item exists in the cache and we can add it directly to our list
+                mItems.add((Item) ItemCache.getInstance().getCache().get(KEY));
+            }
+        }
+    }
+
+    private void loadItemsFromCache() {
+        Collection<Object> keyset =  ItemCache.getInstance().getCache().snapshot().keySet();
+        for (Object o : keyset) {
+            mItems.add((Item) ItemCache.getInstance().getCache().get(o));
+        }
     }
 
     @Override

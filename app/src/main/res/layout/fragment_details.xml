@@ -37,6 +37,8 @@
             android:id="@+id/tvMilesAway"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/tvDescription"
+            android:layout_centerHorizontal="true"
             android:textColor="@android:color/black"
             android:textSize="@dimen/distance_text_size"
             tools:text="5 miles away" />

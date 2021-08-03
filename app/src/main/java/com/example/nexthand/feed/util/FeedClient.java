@@ -22,9 +22,9 @@ public class FeedClient {
         this.mUser = user;
     }
 
-    public void queryPostsFromDatabase(Location location, FindCallback<Item> callback) {
+    public void queryPosts(Location location, FindCallback<Item> callback, boolean isFromLocalDatabase) {
         ParseQuery<Item> query = ParseQuery.getQuery(Item.class);
-        query.fromLocalDatastore();
+        if (isFromLocalDatabase) query.fromLocalDatabase();
         query.setLimit(QUERY_LIMIT);
         query.include(Item.KEY_AUTHOR);
         query.whereNotEqualTo(Item.KEY_AUTHOR, mUser);
@@ -32,14 +32,8 @@ public class FeedClient {
         query.whereWithinMiles(Item.KEY_LOCATION,  new ParseGeoPoint(location.getLatitude(), location.getLongitude()),3000);
         query.findInBackground(callback);
     }
-
-    public void queryPosts(Location location, FindCallback<Item> callback) {
-        ParseQuery<Item> query = ParseQuery.getQuery(Item.class);
-        query.setLimit(QUERY_LIMIT);
-        query.include(Item.KEY_AUTHOR);
-        query.whereNotEqualTo(Item.KEY_AUTHOR, mUser);
-        query.whereNotContainedIn(Item.KEY_USERS_INQUIRED, Collections.singleton(ParseUser.getCurrentUser()));
-        query.whereWithinMiles(Item.KEY_LOCATION,  new ParseGeoPoint(location.getLatitude(), location.getLongitude()),3000);
-        query.findInBackground(callback);
+    
+    public void queryPostsFromDatabase(Location location, FindCallback<Item> callback) {
+        queryPosts(location, callback, true);
     }
 }

@@ -78,18 +78,20 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
     @Override
     public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.fragment_home, container, false);
+
         mContext = getContext();
-        mItems = new ArrayList();
-        mItemsAdapter = new ItemsAdapter(mContext, mItems, this);
-        mClient = new FeedClient(ParseUser.getCurrentUser());
-        lpiLoading = view.findViewById(R.id.lpiLoading);
-        mRvItems = view.findViewById(R.id.rvItems);
-        mRvItems.setAdapter(mItemsAdapter);
+        mItems = ItemCache.getInstance().loadItemsFromCache();
         mLocationClient = new FusedLocationProviderClient(mContext);
+        mClient = new FeedClient(ParseUser.getCurrentUser());
+        mItemsAdapter = new ItemsAdapter(mContext, mItems, this);
+        mRvItems = view.findViewById(R.id.rvItems);
+        lpiLoading = view.findViewById(R.id.lpiLoading);
+        mRvItems.setAdapter(mItemsAdapter);
         mRvItems.setLayoutManager(new LinearLayoutManager(mContext));
+
         getItemTouchHelper().attachToRecyclerView(mRvItems);
-        loadItemsFromCache();
         sendQuery();
+
         return view;
     }
 
@@ -100,19 +102,9 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
                 .addOnSuccessListener(location -> {
                     if (location != null) {
                         mLocation = location;
-                        mClient.queryPosts(mLocation, (items, e) -> {
-                            if (e != null) {
-                                Log.e(TAG, "Error fetching items!", e);
-                            } else {
-                                mItemsAdapter.clear();
-                                saveItemsToCache(items);
-                                ParseObject.pinAllInBackground(items);
-                                mItemsAdapter.notifyDataSetChanged();
-                                lpiLoading.setVisibility(View.GONE);
-                            }
-                        });
+                        mClient.queryPosts(mLocation, itemCallback);
                     } else {
-                        Log.i(TAG, "Location is null");
+                        Log.i(TAG, "Loocation is null");
                     }
                 })
                 .addOnFailureListener(e -> {
@@ -120,24 +112,17 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
                 });
     }
 
-    private void saveItemsToCache(List<Item> items) {
-        for (Item item : items) {
-            String KEY = item.getObjectId();
-            if (ItemCache.getInstance().getCache().get(KEY) == null) {
-                ItemCache.getInstance().getCache().put(KEY, item);
-                mItems.add(item);
-            } else {
-                mItems.add((Item) ItemCache.getInstance().getCache().get(KEY));
-            }
+    private FindCallback<Item> itemCallback = (items, e) -> {
+        if (e != null) {
+            Log.e(TAG, "Error fetching items!", e);
+        } else {
+            mItemsAdapter.clear();
+            ItemCache.getInstance().saveItemsToCache(items);
+            mItems.addAll(items);
+            mItemsAdapter.notifyDataSetChanged();
+            lpiLoading.setVisibility(View.GONE);
         }
-    }
-
-    private void loadItemsFromCache() {
-        Collection<String> entrySet =  ItemCache.getInstance().getCache().snapshot().keySet();
-        for (String key : entrySet) {
-            mItems.add(ItemCache.getInstance().getCache().get(key));
-        }
-    }
+    };
 
     @Override
     public void onItemClicked(int position) {
@@ -147,11 +132,7 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
     }
 
     private void openDetails(Item item) {
-        Bundle args = new Bundle();
-        args.putSerializable(Item.TAG, item);
-        args.putParcelable(Item.KEY_LOCATION, mLocation);
         Fragment details = DetailsFragment.newInstance(item, mLocation);
-        details.setArguments(args);
         getParentFragmentManager().beginTransaction()
                 .setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
                 .replace(R.id.fragment_container, details)

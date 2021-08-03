@@ -33,6 +33,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
  */
 public class ContactDetailsFragment extends Fragment {
 
+    private static final String ARG_PARAM1 = "ARG_CONTACT";
+
     private Context mContext;
     private Contact mContact;
     private ImageView mIvProfile;
@@ -41,33 +43,12 @@ public class ContactDetailsFragment extends Fragment {
     private View mVPalette;
     private FloatingActionButton mFab;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    public ContactDetailsFragment() {}
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public ContactDetailsFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ContactDetailsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ContactDetailsFragment newInstance(String param1, String param2) {
+    public static ContactDetailsFragment newInstance(Contact param1) {
         ContactDetailsFragment fragment = new ContactDetailsFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putSerializable(ARG_PARAM1, param1);
         fragment.setArguments(args);
         return fragment;
     }
@@ -75,9 +56,9 @@ public class ContactDetailsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+        Bundle args = getArguments();
+        if (args != null) {
+            mContact = (Contact) args.getSerializable(ARG_PARAM1);
         }
     }
 
@@ -86,8 +67,6 @@ public class ContactDetailsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_contact_details, container, false);
         mContext = getContext();
-        Bundle args = getArguments();
-        if (args != null) { mContact = (Contact) args.getSerializable(Contact.TAG); }
         mIvProfile = view.findViewById(R.id.ivProfile);
         mTvName = view.findViewById(R.id.tvName);
         mTvPhone = view.findViewById(R.id.tvPhone);

@@ -48,11 +48,8 @@ import java.util.ArrayList;
  */
 public class DetailsFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-    public static final String TAG = "DetailsFragment";
+    private static final String ARG_ITEM = "Item";
+    private static final String ARG_LOCATION = "Location";
 
     private Item mItem;
     private Context mContext;
@@ -61,33 +58,17 @@ public class DetailsFragment extends Fragment {
     private TextView mTvDescription;
     private TextView mTvMilesAway;
     private ImageView mIvProfileImage;
-    private InquirySender mInquirySender;
     private View mVPalette;
     private Location mLocation;
     private ExtendedFloatingActionButton mFab;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    public DetailsFragment() {}
 
-    public DetailsFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment DetailsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static DetailsFragment newInstance(String param1, String param2) {
+    public static DetailsFragment newInstance(Item item, Location location) {
         DetailsFragment fragment = new DetailsFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putSerializable(ARG_ITEM, item);
+        args.putParcelable(ARG_LOCATION, location);
         fragment.setArguments(args);
         return fragment;
     }
@@ -95,9 +76,10 @@ public class DetailsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle args = getArguments();
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            mItem = (Item) args.getSerializable(ARG_ITEM);
+            mLocation = args.getParcelable(ARG_LOCATION);
         }
     }
 
@@ -105,11 +87,6 @@ public class DetailsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.fragment_details, container, false);
-        Bundle args = getArguments();
-        if (args != null) {
-            mItem = (Item) args.getSerializable(Item.TAG);
-            mLocation = args.getParcelable(Item.KEY_LOCATION);
-        }
 
         mContext = getContext();
         mIvItem = view.findViewById(R.id.ivItem);

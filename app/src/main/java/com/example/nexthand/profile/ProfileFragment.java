@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.nexthand.R;
 import com.example.nexthand.launch.LoginActivity;
+import com.example.nexthand.map.MapFragment;
 import com.example.nexthand.models.Contact;
 import com.example.nexthand.models.Inquiry;
 import com.example.nexthand.models.Item;
@@ -38,7 +39,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the {@link ProfileFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+
 public class ProfileFragment extends Fragment implements InquiriesAdapter.OnClickListener {
+
     public static final String TAG = "ProfileFragment";
     public static final int QUERY_LIMIT = 20;
 
@@ -54,10 +62,16 @@ public class ProfileFragment extends Fragment implements InquiriesAdapter.OnClic
     private final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 24;
     private List<Inquiry> mInquiries;
 
+    public ProfileFragment() {}
+
+    public static ProfileFragment newInstance() {
+        ProfileFragment fragment = new ProfileFragment();
+        return fragment;
+    }
+
     @Nullable
-    @org.jetbrains.annotations.Nullable
     @Override
-    public View onCreateView(@NonNull @org.jetbrains.annotations.NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         mContext = getContext();
         mTvWelcome = view.findViewById(R.id.tvWelcome);
@@ -124,7 +138,7 @@ public class ProfileFragment extends Fragment implements InquiriesAdapter.OnClic
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
             if (resultCode == getActivity().RESULT_OK) {

@@ -17,6 +17,7 @@ import com.example.nexthand.feed.ItemsAdapter;
 import com.example.nexthand.models.Contact;
 import com.example.nexthand.models.Item;
 import com.example.nexthand.models.User;
+import com.example.nexthand.profile.ProfileFragment;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -42,44 +43,16 @@ public class ContactsFragment extends Fragment implements ContactsAdapter.OnClic
     private RecyclerView mRvContacts;
     private LinearProgressIndicator lpiLoading;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    public ContactsFragment() {}
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public ContactsFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ContactsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ContactsFragment newInstance(String param1, String param2) {
+    public static ContactsFragment newInstance() {
         ContactsFragment fragment = new ContactsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -121,10 +94,7 @@ public class ContactsFragment extends Fragment implements ContactsAdapter.OnClic
     }
 
     private void openDetails(Contact contact) {
-        Bundle args = new Bundle();
-        args.putSerializable(Contact.TAG, contact);
-        Fragment details = new ContactDetailsFragment();
-        details.setArguments(args);
+        Fragment details = ContactDetailsFragment.newInstance(contact);
         getParentFragmentManager().beginTransaction()
                 .setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
                 .replace(R.id.fragment_container, details)

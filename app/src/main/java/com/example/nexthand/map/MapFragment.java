@@ -11,14 +11,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-
 import com.example.nexthand.R;
 import com.example.nexthand.models.Item;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -26,23 +22,19 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
-
-import java.util.List;
-
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
+
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the {@link MapFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
 
 @RuntimePermissions
 public class MapFragment extends Fragment {
@@ -55,33 +47,32 @@ public class MapFragment extends Fragment {
     private Context mContext;
     private Location mCurrentLocation;
 
+    public MapFragment() {}
+
+    public static MapFragment newInstance() {
+        MapFragment fragment = new MapFragment();
+        return fragment;
+    }
 
     @Nullable
-    @org.jetbrains.annotations.Nullable
     @Override
-    public View onCreateView(@NonNull @org.jetbrains.annotations.NotNull LayoutInflater inflater,
-                             @Nullable @org.jetbrains.annotations.Nullable ViewGroup container,
-                             @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable  Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_map, container, false);
 
         mContext = getContext();
-
         if (savedInstanceState != null && savedInstanceState.keySet().contains(KEY_LOCATION)) {
-            // TODO: Bundle existing location via saveInstanceState. Since KEY_LOCATION was found in the Bundle,
-            //  we can be sure that mCurrentLocation is not null.
             mCurrentLocation = savedInstanceState.getParcelable(KEY_LOCATION);
         }
 
 
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
-            mapFragment.getMapAsync(new OnMapReadyCallback() {
-                @Override
-                public void onMapReady(GoogleMap map) {
-                    loadMap(map);
-                    map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                }
+            mapFragment.getMapAsync(map -> {
+                loadMap(map);
+                map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
             });
         } else {
             Toast.makeText(mContext, "Error - Map Fragment was null!!", Toast.LENGTH_SHORT).show();
@@ -116,26 +107,20 @@ public class MapFragment extends Fragment {
 
         FusedLocationProviderClient locationClient = getFusedLocationProviderClient(mContext);
         locationClient.getLastLocation()
-                .addOnSuccessListener(new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        if (location != null) {
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                    new LatLng(location.getLatitude(),
-                                            location.getLongitude()), 12));
-                            saveCurrentUserLocation(location);
-                            queryPosts();
-                        } else {
-                            Log.i(TAG, "Location is null!");
-                        }
+                .addOnSuccessListener(location -> {
+                    if (location != null) {
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                new LatLng(location.getLatitude(),
+                                        location.getLongitude()), 12));
+                        saveCurrentUserLocation(location);
+                        queryPosts();
+                    } else {
+                        Log.i(TAG, "Location is null!");
                     }
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "Error trying to get last GPS location");
-                        e.printStackTrace();
-                    }
+                .addOnFailureListener(e -> {
+                    Log.d(TAG, "Error trying to get last GPS location");
+                    e.printStackTrace();
                 });
     }
 

@@ -33,19 +33,19 @@ public class MainActivity extends AppCompatActivity {
                 Fragment selectedFragment = null;
                 switch (item.getItemId()){
                     case R.id.nav_home:
-                        selectedFragment = new HomeFragment();
+                        selectedFragment = HomeFragment.newInstance();
                         break;
                     case R.id.nav_map:
-                        selectedFragment = new MapFragment();
+                        selectedFragment = MapFragment.newInstance();
                         break;
                     case R.id.nav_compose:
-                        selectedFragment = new ComposeFragment();
+                        selectedFragment = ComposeFragment.newInstance();
                         break;
                     case R.id.nav_profile:
-                        selectedFragment = new ProfileFragment();
+                        selectedFragment = ProfileFragment.newInstance();
                         break;
                     case R.id.nav_contacts:
-                        selectedFragment = new ContactsFragment();
+                        selectedFragment = ContactsFragment.newInstance();
                         break;
                 }
                 mFragmentManager.beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();

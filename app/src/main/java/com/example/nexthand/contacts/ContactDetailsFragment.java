@@ -72,7 +72,7 @@ public class ContactDetailsFragment extends Fragment {
         mTvPhone = view.findViewById(R.id.tvPhone);
         mVPalette = view.findViewById(R.id.vPalette);
         mFab = view.findViewById(R.id.fab);
-        Glide.with(mContext).asBitmap().load(mContact.getUser().getParseFile(User.KEY_PROFILEPIC).getUrl()).centerCrop().into(getBitmap());
+        insertProfilePic();
 
         mFab.setOnClickListener(v -> {
             String uri = "tel:" + mContact.getUser().getString(User.KEY_PHONE_NUMBER);
@@ -83,6 +83,10 @@ public class ContactDetailsFragment extends Fragment {
 
         mTvName.setText(mContact.getUser().getString(User.KEY_FIRSTNAME));
         return view;
+    }
+
+    private void insertProfilePic() {
+        Glide.with(mContext).asBitmap().load(mContact.getUser().getParseFile(User.KEY_PROFILEPIC).getUrl()).centerCrop().into(getBitmap());
     }
 
     private CustomTarget<Bitmap> getBitmap() {

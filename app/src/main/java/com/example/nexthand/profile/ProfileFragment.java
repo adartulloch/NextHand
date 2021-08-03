@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.nexthand.R;
+import com.example.nexthand.feed.util.ItemCache;
 import com.example.nexthand.launch.LoginActivity;
 import com.example.nexthand.map.MapFragment;
 import com.example.nexthand.models.Contact;
@@ -84,6 +85,7 @@ public class ProfileFragment extends Fragment implements InquiriesAdapter.OnClic
         mFabLogout = view.findViewById(R.id.fabLogout);
         mFabLogout.setOnClickListener(v -> {
             ParseUser currentUser = ParseUser.getCurrentUser();
+            ItemCache.getInstance().clearCache();
             currentUser.logOut();
             Intent i = new Intent(getContext(), LoginActivity.class);
             startActivity(i);
@@ -105,15 +107,19 @@ public class ProfileFragment extends Fragment implements InquiriesAdapter.OnClic
         query.findInBackground((users, e) -> {
             if (e == null) {
                 for(ParseUser user1 : users) {
-                    Glide.with(mContext)
-                            .load(user1.getParseFile(User.KEY_PROFILEPIC).getUrl())
-                            .circleCrop()
-                            .into(mIvProfileImage);
+                    insertProfilePic(user1.getParseFile(User.KEY_PROFILEPIC).getUrl());
                 }
             } else {
                 Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void insertProfilePic(String url) {
+        Glide.with(mContext)
+                .load(url)
+                .circleCrop()
+                .into(mIvProfileImage);
     }
 
     private void editProfilePic() {

@@ -79,7 +79,7 @@ public class ProfileFragment extends Fragment implements InquiriesAdapter.OnClic
         setProfilePic();
         btnEditProfilePic = view.findViewById(R.id.btnEditProfilePic);
         btnEditProfilePic.setOnClickListener(v -> {
-            launchCamera();
+            editProfilePic();
         });
         mFabLogout = view.findViewById(R.id.fabLogout);
         mFabLogout.setOnClickListener(v -> {
@@ -114,6 +114,10 @@ public class ProfileFragment extends Fragment implements InquiriesAdapter.OnClic
                 Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void editProfilePic() {
+        launchCamera();
     }
 
     private void launchCamera() {

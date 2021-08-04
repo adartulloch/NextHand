@@ -3,10 +3,8 @@ import android.location.Location;
 import android.util.Log;
 
 import com.example.nexthand.models.Item;
-import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import java.util.Collections;
@@ -62,7 +60,6 @@ public class FeedClient {
                             if (e2 != null) {
                                 Log.e(TAG, "Error fetching server items", e2);
                             } else {
-                                ParseObject.pinAllInBackground(serverItems);
                                 cacheItems(serverItems);
                                 mCallbackHandler.onSuccess(serverItems, null);
                             }
@@ -85,6 +82,14 @@ public class FeedClient {
         });
     }
 
+    public void getFromDatabase(Location location) {
+        ParseQuery<Item> query = buildQuery(location);
+        query.fromLocalDatastore();
+        query.findInBackground((items, e) -> {
+            mCallbackHandler.onSuccess(items, e);
+        });
+    }
+
     private ParseQuery<Item> buildQuery(Location location) {
         ParseQuery<Item> query = ParseQuery.getQuery(Item.class);
         query.setLimit(QUERY_LIMIT);
@@ -98,4 +103,5 @@ public class FeedClient {
     private void cacheItems(List<Item> items) {
         ItemCache.getInstance().saveItemsToCache(items);
     }
+
 }

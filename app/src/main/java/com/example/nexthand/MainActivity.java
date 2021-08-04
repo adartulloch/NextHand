@@ -9,9 +9,12 @@ import android.os.Bundle;
 import com.example.nexthand.compose.ComposeFragment;
 import com.example.nexthand.contacts.ContactsFragment;
 import com.example.nexthand.feed.HomeFragment;
+import com.example.nexthand.feed.util.ItemCache;
 import com.example.nexthand.map.MapFragment;
 import com.example.nexthand.profile.ProfileFragment;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.parse.ParseObject;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,6 +29,15 @@ public class MainActivity extends AppCompatActivity {
         mBottomNavigationView = findViewById(R.id.bottom_navigation);
         mBottomNavigationView.setOnNavigationItemSelectedListener(navListener);
         mBottomNavigationView.setSelectedItemId(R.id.nav_home);
+        //Write items from DB to Cache
+        LocalDatabaseManager.writeItemsToCache(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        LocalDatabaseManager.writeItemsToLocalDatabase();
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener =

@@ -21,6 +21,7 @@ public class ParseApplication extends Application {
                 .applicationId(BuildConfig.APPLICATION_ID)
                 .clientKey(BuildConfig.CLIENT_KEY)
                 .server("https://parseapi.back4app.com")
+                .enableLocalDataStore()
                 .build()
         );
     }

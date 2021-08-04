@@ -54,7 +54,7 @@ import permissions.dispatcher.NeedsPermission;
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListener {
+public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListener, FeedClient.CallbackHandler {
 
     public static final String TAG = "HomeFragment";
 
@@ -82,7 +82,7 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
         mContext = getContext();
         mItems = ItemCache.getInstance().loadItemsFromCache();
         mLocationClient = new FusedLocationProviderClient(mContext);
-        mClient = new FeedClient(ParseUser.getCurrentUser());
+        mClient = new FeedClient(ParseUser.getCurrentUser(), this);
         mItemsAdapter = new ItemsAdapter(mContext, mItems, this);
         mRvItems = view.findViewById(R.id.rvItems);
         lpiLoading = view.findViewById(R.id.lpiLoading);
@@ -102,9 +102,9 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
                 .addOnSuccessListener(location -> {
                     if (location != null) {
                         mLocation = location;
-                        mClient.queryPosts(mLocation, itemCallback);
+                        mClient.queryPosts(mLocation);
                     } else {
-                        Log.i(TAG, "Loocation is null");
+                        Log.i(TAG, "Location is null");
                     }
                 })
                 .addOnFailureListener(e -> {
@@ -191,5 +191,13 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
                 icon.draw(c);
             }
         });
+    }
+
+    @Override
+    public void onSuccess(List<Item> items, ParseException e) {
+        mItemsAdapter.clear();
+        mItems.addAll(items);
+        mItemsAdapter.notifyDataSetChanged();
+        lpiLoading.setVisibility(View.GONE);
     }
 }

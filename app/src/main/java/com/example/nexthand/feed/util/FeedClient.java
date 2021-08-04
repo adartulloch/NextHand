@@ -1,39 +1,89 @@
 package com.example.nexthand.feed.util;
 import android.location.Location;
+import android.util.Log;
+
 import com.example.nexthand.models.Item;
 import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import java.util.Collections;
+import java.util.List;
 
 /**
- * A client class responsible of communicating with the Parse API
+ * Simple API responsible of communicating with the Parse
  * to create a home feed. Handles in-memory cache via the ItemCache
  * instance. Handles offline loading of items via the Parse localDatabase.
  */
+
 public class FeedClient {
+
+    public interface CallbackHandler {
+        void onSuccess(List<Item> items, ParseException e);
+    }
+
     public static final String TAG = "FeedClient";
     public static final int QUERY_LIMIT = 20;
 
     private ParseUser mUser;
+    private CallbackHandler mCallbackHandler;
 
-    public FeedClient(ParseUser user) {
+    public FeedClient(ParseUser user, CallbackHandler callbackHandler) {
         this.mUser = user;
+        this.mCallbackHandler = callbackHandler;
     }
 
-    public void queryPosts(Location location, FindCallback<Item> callback, boolean isFromLocalDatabase) {
+    public void queryPosts(Location location) {
+        //Flow : Check cache, then check DB, then query Parse
+        List<Item> cachedItems = ItemCache.getInstance().loadItemsFromCache();
+        if (!cachedItems.isEmpty()) {
+            mCallbackHandler.onSuccess(cachedItems, null);
+        } else {
+            ParseQuery<Item> localQuery = buildQuery(location);
+            localQuery.fromLocalDatastore();
+            localQuery.findInBackground((localItems, e1) -> {
+                if (e1 != null) {
+                    Log.e(TAG, "Error fetching offline items", e1);
+                } else {
+                    if (!localItems.isEmpty()) {
+                        mCallbackHandler.onSuccess(localItems, null);
+                    } else {
+                        //Must fetch new items from server
+                        ParseQuery<Item> serverQuery = buildQuery(location);
+                        serverQuery.findInBackground((serverItems, e2) -> {
+                            if (e2 != null) {
+                                Log.e(TAG, "Error fetching server items", e2);
+                            } else {
+                                ItemCache.getInstance().saveItemsToCache(serverItems);
+                                mCallbackHandler.onSuccess(serverItems, null);
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    }
+
+    public void queryPosts(Location location, boolean isForcedFetch) {
+        ParseQuery<Item> query = buildQuery(location);
+        query.findInBackground((items, e) -> {
+            if (e != null) {
+                Log.e(TAG, "Error force-fetching from Parse");
+            } else {
+                ItemCache.getInstance().saveItemsToCache(items);
+                mCallbackHandler.onSuccess(items, null);
+            }
+        });
+    }
+
+    private ParseQuery<Item> buildQuery(Location location) {
         ParseQuery<Item> query = ParseQuery.getQuery(Item.class);
-        if (isFromLocalDatabase) query.fromLocalDatabase();
         query.setLimit(QUERY_LIMIT);
         query.include(Item.KEY_AUTHOR);
         query.whereNotEqualTo(Item.KEY_AUTHOR, mUser);
         query.whereNotContainedIn(Item.KEY_USERS_INQUIRED, Collections.singleton(ParseUser.getCurrentUser()));
         query.whereWithinMiles(Item.KEY_LOCATION,  new ParseGeoPoint(location.getLatitude(), location.getLongitude()),3000);
-        query.findInBackground(callback);
-    }
-    
-    public void queryPostsFromDatabase(Location location, FindCallback<Item> callback) {
-        queryPosts(location, callback, true);
+        return query;
     }
 }

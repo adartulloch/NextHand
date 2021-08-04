@@ -86,10 +86,12 @@ public class ProfileFragment extends Fragment implements InquiriesAdapter.OnClic
         mFabLogout.setOnClickListener(v -> {
             ParseUser currentUser = ParseUser.getCurrentUser();
             ItemCache.getInstance().clearCache();
-            currentUser.logOut();
-            Intent i = new Intent(getContext(), LoginActivity.class);
-            startActivity(i);
-            getActivity().finish();
+            ParseObject.unpinAllInBackground(e -> {
+                currentUser.logOut();
+                Intent i = new Intent(getContext(), LoginActivity.class);
+                startActivity(i);
+                getActivity().finish();
+            });
         });
         mTvWelcome.setText(getString(R.string.welcome, ParseUser.getCurrentUser().getUsername()));
         mInquiries = new ArrayList();

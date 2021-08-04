@@ -6,6 +6,7 @@ import com.example.nexthand.models.Item;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import java.util.Collections;
@@ -34,8 +35,14 @@ public class FeedClient {
         this.mCallbackHandler = callbackHandler;
     }
 
+    /**
+     * Retrieves Items from either local database,
+     * ItemCache, or Parse. The order is to first check the cache,
+     * then the local DB, and eventually fetch from Parse if
+     * necessary. Items become available via {@link #mCallbackHandler}
+     * @param location
+     */
     public void queryPosts(Location location) {
-        //Flow : Check cache, then check DB, then query Parse
         List<Item> cachedItems = ItemCache.getInstance().loadItemsFromCache();
         if (!cachedItems.isEmpty()) {
             mCallbackHandler.onSuccess(cachedItems, null);
@@ -49,13 +56,14 @@ public class FeedClient {
                     if (!localItems.isEmpty()) {
                         mCallbackHandler.onSuccess(localItems, null);
                     } else {
-                        //Must fetch new items from server
+                        //Get fresh items from server
                         ParseQuery<Item> serverQuery = buildQuery(location);
                         serverQuery.findInBackground((serverItems, e2) -> {
                             if (e2 != null) {
                                 Log.e(TAG, "Error fetching server items", e2);
                             } else {
-                                ItemCache.getInstance().saveItemsToCache(serverItems);
+                                ParseObject.pinAllInBackground(serverItems);
+                                cacheItems(serverItems);
                                 mCallbackHandler.onSuccess(serverItems, null);
                             }
                         });
@@ -71,7 +79,7 @@ public class FeedClient {
             if (e != null) {
                 Log.e(TAG, "Error force-fetching from Parse");
             } else {
-                ItemCache.getInstance().saveItemsToCache(items);
+                cacheItems(items);
                 mCallbackHandler.onSuccess(items, null);
             }
         });
@@ -85,5 +93,9 @@ public class FeedClient {
         query.whereNotContainedIn(Item.KEY_USERS_INQUIRED, Collections.singleton(ParseUser.getCurrentUser()));
         query.whereWithinMiles(Item.KEY_LOCATION,  new ParseGeoPoint(location.getLatitude(), location.getLongitude()),3000);
         return query;
+    }
+
+    private void cacheItems(List<Item> items) {
+        ItemCache.getInstance().saveItemsToCache(items);
     }
 }

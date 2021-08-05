@@ -1,7 +1,4 @@
 package com.example.nexthand.feed;
-
-import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -9,8 +6,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
-import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,42 +18,27 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import com.example.nexthand.R;
-import com.example.nexthand.compose.ComposeFragment;
 import com.example.nexthand.feed.util.FeedClient;
 import com.example.nexthand.feed.util.InquirySender;
 import com.example.nexthand.feed.util.ItemCache;
-import com.example.nexthand.models.Inquiry;
 import com.example.nexthand.models.Item;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
-import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseGeoPoint;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
-import permissions.dispatcher.NeedsPermission;
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
+
 public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListener, FeedClient.CallbackHandler {
 
     public static final String TAG = "HomeFragment";
+    public static final String ARG_LOCATION = "ARG_LOCATION";
 
     private Context mContext;
     private List<Item> mItems;
@@ -67,14 +47,25 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
     private LinearProgressIndicator mLpiLoading;
     private SwipeRefreshLayout mSwipeContainer;
     private RecyclerView mRvItems;
-    private FusedLocationProviderClient mLocationClient;
     private Location mLocation;
 
     public HomeFragment() {}
 
-    public static HomeFragment newInstance() {
+    public static HomeFragment newInstance(Location location) {
         HomeFragment fragment = new HomeFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_LOCATION, location);
+        fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle args = getArguments();
+        if (args != null) {
+            mLocation = args.getParcelable(ARG_LOCATION);
+        }
     }
 
     @Nullable
@@ -84,7 +75,6 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
 
         mContext = getContext();
         mItems = ItemCache.getInstance().loadItemsFromCache();
-        mLocationClient = new FusedLocationProviderClient(mContext);
         mClient = new FeedClient(ParseUser.getCurrentUser(), this);
         mItemsAdapter = new ItemsAdapter(mContext, mItems, this);
         mRvItems = view.findViewById(R.id.rvItems);
@@ -101,24 +91,11 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
         return view;
     }
 
-    @SuppressLint("MissingPermission")
-    @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
     private void sendQuery(boolean isForcedFetched) {
-        mLocationClient.getLastLocation()
-                .addOnSuccessListener(location -> {
-                    if (location != null) {
-                        mLocation = location;
-                        if (isForcedFetched)
-                            mClient.queryPosts(location, true);
-                        else
-                            mClient.queryPosts(mLocation);
-                    } else {
-                        Log.i(TAG, "Location is null");
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG,"Unable to get the user's location", e);
-                });
+        if (isForcedFetched)
+            mClient.queryPosts(mLocation, true);
+        else
+            mClient.queryPosts(mLocation);
     }
 
     @Override

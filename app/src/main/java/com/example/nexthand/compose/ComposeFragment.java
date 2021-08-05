@@ -9,12 +9,10 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
-
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -26,35 +24,26 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.Toast;
-import android.widget.ToggleButton;
-
-import com.example.nexthand.MainActivity;
 import com.example.nexthand.R;
 import com.example.nexthand.models.Item;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
-
 import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
-
-import permissions.dispatcher.NeedsPermission;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link ComposeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
+
 public class ComposeFragment extends Fragment {
 
     public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
     public static final String TAG = "ComposeFragment";
+    public static final String ARG_LOCATION = "ARG_LOCATION";
 
     private Context mContext;
     private File mPhotoFile;
@@ -65,19 +54,25 @@ public class ComposeFragment extends Fragment {
     private ImageView mIvPostImage;
     private Switch swDonation;
     public String mPhotoFileName = "photo.jpg";
-    private FusedLocationProviderClient mLocationClient;
     private Location mLocation;
 
     public ComposeFragment() { }
 
-    public static ComposeFragment newInstance() {
+    public static ComposeFragment newInstance(Location location) {
         ComposeFragment fragment = new ComposeFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_LOCATION, location);
+        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle args = getArguments();
+        if (args != null) {
+            mLocation = args.getParcelable(ARG_LOCATION);
+        }
     }
 
     @Override
@@ -96,7 +91,6 @@ public class ComposeFragment extends Fragment {
         mIvPostImage = view.findViewById(R.id.ivPostImage);
         mBtnCaptureImage = view.findViewById(R.id.btnCaptureImage);
         mEtDescription = view.findViewById(R.id.etDescription);
-        mLocationClient = new FusedLocationProviderClient(mContext);
         swDonation = view.findViewById(R.id.swDonation);
 
         mBtnCaptureImage.setOnClickListener(v -> launchCamera());
@@ -115,25 +109,8 @@ public class ComposeFragment extends Fragment {
             }
             Boolean isDonation = swDonation.isChecked();
             ParseUser currentUser = ParseUser.getCurrentUser();
-            getMyLocationAndPost(title, description, currentUser, isDonation);
+            savePost(title, description, currentUser, mPhotoFile, isDonation);
         });
-    }
-
-    @SuppressLint("MissingPermission")
-    @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
-    private void getMyLocationAndPost(String title, String description, ParseUser currentUser, Boolean isDonation) {
-        mLocationClient.getLastLocation()
-                .addOnSuccessListener(location -> {
-                    if (location != null) {
-                        mLocation = location;
-                        savePost(title, description, currentUser, mPhotoFile, isDonation, mLocation);
-                    } else {
-                        Log.i(TAG, "Location is null");
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG,"Unable to get the user's location", e);
-                });
     }
 
     private void launchCamera() {
@@ -170,7 +147,7 @@ public class ComposeFragment extends Fragment {
         }
     }
 
-    private void savePost(String title, String caption, ParseUser currentUser, File photoFile, Boolean isDonation, Location location) {
+    private void savePost(String title, String caption, ParseUser currentUser, File photoFile, Boolean isDonation) {
         Item item = new Item();
         item.setTitle(title);
         item.setCaption(caption);
@@ -178,13 +155,12 @@ public class ComposeFragment extends Fragment {
         item.setImage(new ParseFile(photoFile));
         item.setDonation(isDonation);
         item.setIsAvailable(true);
-        item.setLocation(new ParseGeoPoint(location.getLatitude(), location.getLongitude()));
-        item.saveEventually(e -> {
+        item.setLocation(new ParseGeoPoint(mLocation.getLatitude(), mLocation.getLongitude()));
+        item.saveInBackground(e -> {
             if (e != null) {
                 Log.e(TAG, "Error while saving " + e);
                 Toast.makeText(getContext(), "Error while saving!", Toast.LENGTH_LONG).show();
             }
-            Log.i(TAG, "Post save was successful!");
             mEtDescription.setText("");
             mEtTitle.setText("");
             mIvPostImage.setImageResource(0);

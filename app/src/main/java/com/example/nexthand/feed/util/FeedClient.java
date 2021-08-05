@@ -20,6 +20,7 @@ public class FeedClient {
 
     public interface CallbackHandler {
         void onSuccess(List<Item> items, ParseException e);
+        void onFailure(List<Item> items, ParseException e);
     }
 
     public static final String TAG = "FeedClient";
@@ -49,7 +50,8 @@ public class FeedClient {
             localQuery.fromLocalDatastore();
             localQuery.findInBackground((localItems, e1) -> {
                 if (e1 != null) {
-                    Log.e(TAG, "Error fetching offline items", e1);
+                    Log.e(TAG, "Error fetching from the local database", e1);
+                    mCallbackHandler.onFailure(localItems, e1);
                 } else {
                     if (!localItems.isEmpty()) {
                         mCallbackHandler.onSuccess(localItems, null);
@@ -59,6 +61,7 @@ public class FeedClient {
                         serverQuery.findInBackground((serverItems, e2) -> {
                             if (e2 != null) {
                                 Log.e(TAG, "Error fetching server items", e2);
+                                mCallbackHandler.onFailure(serverItems, e2);
                             } else {
                                 cacheItems(serverItems);
                                 mCallbackHandler.onSuccess(serverItems, null);
@@ -75,6 +78,7 @@ public class FeedClient {
         query.findInBackground((items, e) -> {
             if (e != null) {
                 Log.e(TAG, "Error force-fetching from Parse");
+                mCallbackHandler.onFailure(items, e);
             } else {
                 cacheItems(items);
                 mCallbackHandler.onSuccess(items, null);
@@ -103,5 +107,4 @@ public class FeedClient {
     private void cacheItems(List<Item> items) {
         ItemCache.getInstance().saveItemsToCache(items);
     }
-
 }

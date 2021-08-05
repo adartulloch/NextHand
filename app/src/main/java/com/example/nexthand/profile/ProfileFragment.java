@@ -236,7 +236,8 @@ public class ProfileFragment extends Fragment implements InquiriesAdapter.OnClic
                         Toast.makeText(mContext, "Error: "+e2.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
-            }else{
+                item.unpinInBackground();
+            } else {
                 Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

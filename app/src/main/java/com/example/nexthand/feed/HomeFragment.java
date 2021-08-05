@@ -22,6 +22,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.example.nexthand.R;
 import com.example.nexthand.compose.ComposeFragment;
 import com.example.nexthand.feed.util.FeedClient;
@@ -62,7 +64,8 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
     private List<Item> mItems;
     private ItemsAdapter mItemsAdapter;
     private FeedClient mClient;
-    private LinearProgressIndicator lpiLoading;
+    private LinearProgressIndicator mLpiLoading;
+    private SwipeRefreshLayout mSwipeContainer;
     private RecyclerView mRvItems;
     private FusedLocationProviderClient mLocationClient;
     private Location mLocation;
@@ -85,24 +88,30 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
         mClient = new FeedClient(ParseUser.getCurrentUser(), this);
         mItemsAdapter = new ItemsAdapter(mContext, mItems, this);
         mRvItems = view.findViewById(R.id.rvItems);
-        lpiLoading = view.findViewById(R.id.lpiLoading);
+        mLpiLoading = view.findViewById(R.id.lpiLoading);
+        mSwipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
+        configureSwipeRefreshLayout(mSwipeContainer);
+        mSwipeContainer.setOnRefreshListener(() -> { sendQuery(true); });
         mRvItems.setAdapter(mItemsAdapter);
         mRvItems.setLayoutManager(new LinearLayoutManager(mContext));
 
         getItemTouchHelper().attachToRecyclerView(mRvItems);
-        sendQuery();
+        sendQuery(false);
 
         return view;
     }
 
     @SuppressLint("MissingPermission")
     @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
-    private void sendQuery() {
+    private void sendQuery(boolean isForcedFetched) {
         mLocationClient.getLastLocation()
                 .addOnSuccessListener(location -> {
                     if (location != null) {
                         mLocation = location;
-                        mClient.queryPosts(mLocation);
+                        if (isForcedFetched)
+                            mClient.queryPosts(location, true);
+                        else
+                            mClient.queryPosts(mLocation);
                     } else {
                         Log.i(TAG, "Location is null");
                     }
@@ -111,18 +120,6 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
                     Log.e(TAG,"Unable to get the user's location", e);
                 });
     }
-
-    private FindCallback<Item> itemCallback = (items, e) -> {
-        if (e != null) {
-            Log.e(TAG, "Error fetching items!", e);
-        } else {
-            mItemsAdapter.clear();
-            ItemCache.getInstance().saveItemsToCache(items);
-            mItems.addAll(items);
-            mItemsAdapter.notifyDataSetChanged();
-            lpiLoading.setVisibility(View.GONE);
-        }
-    };
 
     @Override
     public void onItemClicked(int position) {
@@ -138,6 +135,13 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
                 .replace(R.id.fragment_container, details)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    private void configureSwipeRefreshLayout(SwipeRefreshLayout swipeRefreshLayout) {
+        swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
     }
 
     private ItemTouchHelper getItemTouchHelper() {
@@ -195,9 +199,16 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
 
     @Override
     public void onSuccess(List<Item> items, ParseException e) {
+        mSwipeContainer.setRefreshing(false);
         mItemsAdapter.clear();
         mItems.addAll(items);
         mItemsAdapter.notifyDataSetChanged();
-        lpiLoading.setVisibility(View.GONE);
+        mLpiLoading.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onFailure(List<Item> items, ParseException e) {
+        mSwipeContainer.setRefreshing(false);
+        Toast.makeText(mContext, "Unable to fetch Items. Please check your network connection and try again", Toast.LENGTH_LONG).show();
     }
 }

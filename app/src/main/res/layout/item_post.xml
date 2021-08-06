@@ -43,5 +43,6 @@
                 android:textSize="@dimen/contact_text_size"
                 tools:text="Someone borrow my little brother" />
         </RelativeLayout>
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

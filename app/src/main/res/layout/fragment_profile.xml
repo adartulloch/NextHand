@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/ivProfileImage"
         android:layout_centerHorizontal="true"
-        android:text="Edit profile picture"
+        android:text="Edit your profile picture"
         android:textAllCaps="false"
         style="@style/Widget.MaterialComponents.Button.TextButton"
         />
@@ -47,7 +47,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="5dp"
         android:textColor="@color/black"
-        android:text="View your inquiries below"
+        android:text="Manage inquiries on your items below"
         android:textSize="20sp"
          />
 

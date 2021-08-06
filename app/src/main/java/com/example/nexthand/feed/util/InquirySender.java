@@ -14,6 +14,10 @@ import com.parse.SaveCallback;
 
 import org.json.JSONArray;
 
+/**
+ * Static class to make inquiry requests.
+ */
+
 public class InquirySender {
 
     public static final String TAG = "InquirySender";
@@ -45,6 +49,7 @@ public class InquirySender {
                 if (arr == null) {
                     arr = new JSONArray(); //Default value is not an empty JSONArray
                 }
+                ItemCache.getInstance().evictItem(item); // Parse will update the local version, however we still need to manually evict from the cache
                 arr.put(user);
                 object.put(Item.KEY_USERS_INQUIRED, arr);
                 object.saveInBackground();

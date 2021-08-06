@@ -13,13 +13,17 @@ import com.parse.ParseUser;
 
 import java.util.List;
 
+/**
+ * Util class to manage Items on the disk, facilitating communication between
+ * the in-memory cache and Parse localDatastore
+ */
 
 public class LocalDatabaseManager {
 
     public static final String TAG = "LocalDatabaseManager";
 
     @SuppressLint("MissingPermission")
-    public static void writeItemsToCache(Context context, Location queryLocation) {
+    public static void writeItemsToCache(Location queryLocation) {
         FeedClient feedClient = new FeedClient(ParseUser.getCurrentUser(), new FeedClient.CallbackHandler() {
                 @Override
                 public void onSuccess(List<Item> items, ParseException e) {

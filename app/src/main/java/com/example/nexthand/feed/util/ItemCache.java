@@ -55,6 +55,11 @@ public class ItemCache {
         }
     }
 
+    public void evictItem(Item item) {
+        if (item != null) {
+            mCache.remove(item.getObjectId());
+        }
+    }
     public void clearCache() {
         mCache.evictAll();
     }

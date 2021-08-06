@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
                 .addOnSuccessListener(location -> {
                     if (location != null) {
                         mCurrentLocation = location;
-                        LocalDatabaseManager.writeItemsToCache(this, mCurrentLocation); // Write DB items to the Cache
+                        LocalDatabaseManager.writeItemsToCache(mCurrentLocation); // Write DB items to the Cache
                         setBottomNavigationView();
                     }
                 })

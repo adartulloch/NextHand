@@ -5,47 +5,32 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.palette.graphics.Palette;
-
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.nexthand.R;
 import com.example.nexthand.feed.util.InquirySender;
-import com.example.nexthand.models.Inquiry;
 import com.example.nexthand.models.Item;
 import com.example.nexthand.models.User;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.parse.Parse;
-import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
-
-import org.json.JSONArray;
-
-import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link DetailsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
+
 public class DetailsFragment extends Fragment {
 
     private static final String ARG_ITEM = "Item";

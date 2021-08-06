@@ -1,7 +1,5 @@
 package com.example.nexthand.compose;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -32,6 +30,7 @@ import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 import org.jetbrains.annotations.NotNull;
 import java.io.File;
+
 
 /**
  * A simple {@link Fragment} subclass.

@@ -33,7 +33,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
  */
 public class ContactDetailsFragment extends Fragment {
 
-    private static final String ARG_PARAM1 = "ARG_CONTACT";
+    private static final String ARG_CONTACT = "ARG_CONTACT";
 
     private Context mContext;
     private Contact mContact;
@@ -45,10 +45,10 @@ public class ContactDetailsFragment extends Fragment {
 
     public ContactDetailsFragment() {}
 
-    public static ContactDetailsFragment newInstance(Contact param1) {
+    public static ContactDetailsFragment newInstance(Contact contact) {
         ContactDetailsFragment fragment = new ContactDetailsFragment();
         Bundle args = new Bundle();
-        args.putSerializable(ARG_PARAM1, param1);
+        args.putSerializable(ARG_CONTACT, contact);
         fragment.setArguments(args);
         return fragment;
     }
@@ -58,7 +58,7 @@ public class ContactDetailsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
         if (args != null) {
-            mContact = (Contact) args.getSerializable(ARG_PARAM1);
+            mContact = (Contact) args.getSerializable(ARG_CONTACT);
         }
     }
 

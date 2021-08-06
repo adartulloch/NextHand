@@ -1,6 +1,4 @@
 package com.example.nexthand.contacts;
-
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -9,21 +7,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.palette.graphics.Palette;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.nexthand.R;
 import com.example.nexthand.models.Contact;
 import com.example.nexthand.models.User;
-import com.parse.ParseFile;
-import com.parse.ParseUser;
-
 import java.util.List;
 
 public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.VH> {
@@ -95,9 +88,8 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.VH> {
                 }
 
                 @Override
-                public void onLoadCleared(@Nullable @org.jetbrains.annotations.Nullable Drawable placeholder) { }
+                public void onLoadCleared(@Nullable Drawable placeholder) { }
             };
-            String username = contact.getUser().getUsername();
             Glide.with(mContext).asBitmap().load(contact.getUser().getParseFile(User.KEY_PROFILEPIC).getUrl()).centerCrop().into(target);
         }
     }

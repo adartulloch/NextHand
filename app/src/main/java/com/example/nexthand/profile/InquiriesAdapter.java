@@ -88,7 +88,6 @@ public class InquiriesAdapter extends RecyclerView.Adapter<InquiriesAdapter.View
             String body = isDonation ? itemView.getResources().getString(R.string.donation_inquiry, itemTitle) :
                     itemView.getResources().getString(R.string.borrow_inquiry, itemTitle);
             tvBody.setText(body);
-            ParseFile photo = inquiry.getSender().getParseFile(User.KEY_PROFILEPIC);
             Glide.with(mContext)
                     .load(inquiry.getSender().getParseFile(User.KEY_PROFILEPIC).getUrl())
                     .circleCrop()

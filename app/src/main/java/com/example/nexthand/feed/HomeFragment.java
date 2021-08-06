@@ -6,6 +6,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -187,5 +188,6 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
     public void onFailure(List<Item> items, ParseException e) {
         mSwipeContainer.setRefreshing(false);
         Toast.makeText(mContext, "Unable to fetch Items. Please check your network connection and try again", Toast.LENGTH_LONG).show();
+        Log.e(TAG, "Error fetching items", e);
     }
 }

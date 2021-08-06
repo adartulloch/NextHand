@@ -64,15 +64,11 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder>{
 
         private ImageView ivPost;
         private TextView tvTitle;
-        private Button btnAccept;
-        private Button btnCancel;
 
         public ViewHolder(@NotNull View itemView) {
             super(itemView);
             ivPost = itemView.findViewById(R.id.ivPost);
             tvTitle = itemView.findViewById(R.id.tvTitle);
-            btnAccept = itemView.findViewById(R.id.btnAccept);
-            btnCancel = itemView.findViewById(R.id.btnCancel);
 
             itemView.setOnClickListener(v -> {
                 mOnClickListener.onItemClicked(getAdapterPosition());

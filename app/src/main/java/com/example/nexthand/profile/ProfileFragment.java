@@ -26,7 +26,6 @@ import com.bumptech.glide.Glide;
 import com.example.nexthand.R;
 import com.example.nexthand.feed.util.ItemCache;
 import com.example.nexthand.launch.LoginActivity;
-import com.example.nexthand.map.MapFragment;
 import com.example.nexthand.models.Contact;
 import com.example.nexthand.models.Inquiry;
 import com.example.nexthand.models.Item;

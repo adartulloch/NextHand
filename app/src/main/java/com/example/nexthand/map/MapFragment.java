@@ -18,7 +18,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.parse.Parse;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
+
+import java.util.Collections;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -97,7 +101,10 @@ public class MapFragment extends Fragment {
 
     private void queryPosts() {
         ParseQuery<Item> query = ParseQuery.getQuery(Item.class);
+        ParseUser currentUser = ParseUser.getCurrentUser();
         query.include(Item.KEY_AUTHOR);
+        query.whereNotEqualTo(Item.KEY_AUTHOR, currentUser);
+        query.whereNotContainedIn(Item.KEY_USERS_INQUIRED, Collections.singleton(currentUser));
         query.findInBackground((items, e) -> {
             for (Item item : items) {
                 if (item.getIsAvailable()) {

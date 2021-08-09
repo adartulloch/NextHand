@@ -210,10 +210,10 @@ public class ProfileFragment extends Fragment implements InquiriesAdapter.OnClic
                     Toast.makeText(mContext,
                              mInquiries.get(position).getSender().getUsername() + " has been saved as a contact!",
                             Toast.LENGTH_SHORT).show();
-                    Inquiry removed = mInquiries.get(position);
+                    Inquiry removedInquiry = mInquiries.get(position);
                     mInquiries.remove(position);
                     mInquiriesAdapter.notifyItemRemoved(position);
-                    deleteInquiry(removed, true);
+                    deleteInquiry(removedInquiry, true);
                 }
             });
     }

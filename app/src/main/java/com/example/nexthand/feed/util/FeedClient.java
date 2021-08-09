@@ -74,16 +74,20 @@ public class FeedClient {
     }
 
     public void queryPosts(Location location, boolean isForcedFetch) {
-        ParseQuery<Item> query = buildQuery(location);
-        query.findInBackground((items, e) -> {
-            if (e != null) {
-                Log.e(TAG, "Error force-fetching from Parse");
-                mCallbackHandler.onFailure(items, e);
-            } else {
-                cacheItems(items);
-                mCallbackHandler.onSuccess(items, null);
-            }
-        });
+        if (isForcedFetch) {
+            ParseQuery<Item> query = buildQuery(location);
+            query.findInBackground((items, e) -> {
+                if (e != null) {
+                    Log.e(TAG, "Error force-fetching from Parse");
+                    mCallbackHandler.onFailure(items, e);
+                } else {
+                    cacheItems(items);
+                    mCallbackHandler.onSuccess(items, null);
+                }
+            });
+        } else {
+            queryPosts(location);
+        }
     }
 
     public void getFromDatabase(Location location) {

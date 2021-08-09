@@ -80,13 +80,14 @@ public class HomeFragment extends Fragment implements ItemsAdapter.OnClickListen
         mItemsAdapter = new ItemsAdapter(mContext, mItems, this);
         mRvItems = view.findViewById(R.id.rvItems);
         mLpiLoading = view.findViewById(R.id.lpiLoading);
-        mSwipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
+        mSwipeContainer = view.findViewById(R.id.swipeContainer);
         configureSwipeRefreshLayout(mSwipeContainer);
         mSwipeContainer.setOnRefreshListener(() -> { sendQuery(true); });
         mRvItems.setAdapter(mItemsAdapter);
         mRvItems.setLayoutManager(new LinearLayoutManager(mContext));
 
         getItemTouchHelper().attachToRecyclerView(mRvItems);
+
         sendQuery(false);
 
         return view;

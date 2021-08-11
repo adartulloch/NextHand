@@ -57,7 +57,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:text="Yes, I don't need this item returned to me" />
+        android:text="I need this item returned to me" />
 
     <RelativeLayout
         android:layout_width="match_parent"

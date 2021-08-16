@@ -15,7 +15,7 @@ public class LoginActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.container, new LoginFragment())
+                    .replace(R.id.container, LoginFragment.newInstance())
                     .commit();
         }
     }
